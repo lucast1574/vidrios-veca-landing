@@ -1,4 +1,5 @@
 FROM nginx:stable-alpine
+RUN sed -i 's/^worker_processes.*/worker_processes 2;/' /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html styles.css app.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/

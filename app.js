@@ -45,13 +45,6 @@ menuButton.addEventListener('click', () => {
 mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
 addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
 
-document.querySelectorAll('.service').forEach(service => {
-  service.addEventListener('toggle', () => {
-    if (service.open) document.querySelectorAll('.service').forEach(other => {
-      if (other !== service) other.open = false;
-    });
-  });
-});
 document.querySelectorAll('[data-project]').forEach(link => {
   link.addEventListener('click', () => { document.querySelector('#project').value = link.dataset.project; });
 });

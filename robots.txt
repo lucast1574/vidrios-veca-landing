@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://veca.com.pe/sitemap.xml

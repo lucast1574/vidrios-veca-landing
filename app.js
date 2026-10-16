@@ -10,8 +10,7 @@ function finishIntro() {
   setTimeout(() => intro.remove(), 700);
 }
 document.querySelector('#skip-intro').addEventListener('click', finishIntro);
-if (reducedMotion.matches || location.hash) finishIntro();
-else setTimeout(finishIntro, 1900);
+finishIntro();
 
 const revealObserver = new IntersectionObserver(entries => {
   for (const entry of entries) {

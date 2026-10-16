@@ -1,16 +1,6 @@
 document.documentElement.classList.add('js');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const intro = document.querySelector('#intro');
-let introFinished = false;
-function finishIntro() {
-  if (introFinished) return;
-  introFinished = true;
-  intro.classList.add('done');
-  document.body.classList.add('ready');
-  setTimeout(() => intro.remove(), 700);
-}
-document.querySelector('#skip-intro').addEventListener('click', finishIntro);
-finishIntro();
+document.body.classList.add('ready');
 
 const revealObserver = new IntersectionObserver(entries => {
   for (const entry of entries) {

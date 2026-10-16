@@ -211,3 +211,8 @@ html:not(.js) .intro{display:none}html:not(.js) .line>span,html:not(.js) .hero-e
  .project-start .button{width:100%;font-size:13px;gap:13px}
 }
 @media(max-width:370px){.solution-body{padding:23px 19px 18px}.solution-body h3{font-size:28px}.solution-category{font-size:9px}.project-start-copy{padding:27px 20px}.project-start-copy h3{font-size:29px}.project-start .button{padding:15px 13px;font-size:12px}}
+
+/* Canal de atención directo de Vidrios VECA. */
+.whatsapp-contact{margin-top:30px;position:relative}.whatsapp-contact>p:first-child{font-size:10px;letter-spacing:.14em;color:#bfc1d2}.whatsapp-number{display:flex;align-items:center;gap:12px;width:fit-content;font-size:clamp(22px,2.7vw,34px);letter-spacing:-.04em;margin:12px 0 20px}.whatsapp-number .icon{width:26px;height:26px;color:var(--orange);flex-shrink:0}.whatsapp-help{font-size:11px;line-height:1.8;color:#b2b4c6;margin-top:14px;max-width:340px}.footer-whatsapp{display:flex;align-items:center;gap:10px;font-size:10px;line-height:1.7}.footer-whatsapp .icon{color:var(--orange);flex-shrink:0}.footer-whatsapp strong{font-size:12px;font-weight:500;white-space:nowrap}.service-whatsapp{margin-left:24px}#whatsapp-request{width:100%;margin-top:20px}.button-copy{background:transparent;border:1px solid #ccc;color:var(--ink);margin-top:12px;width:100%}
+@media(max-width:760px){.service-whatsapp{margin:18px 0 0;display:flex;width:fit-content}.whatsapp-number{font-size:25px}footer{flex-wrap:wrap;gap:22px}.footer-whatsapp{max-width:100%}footer>span{margin-left:0}.whatsapp-contact .button{gap:12px}}
+@media(max-width:760px){footer .footer-whatsapp{grid-column:1/-1;justify-self:start}}

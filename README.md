@@ -17,6 +17,6 @@ Dockerfile de producción con Nginx en puerto 80 y endpoint /health. Configurar 
 
 ## Pendiente interno
 
-El formulario prepara un resumen local y permite copiarlo; no transmite ni guarda consultas. El backend y el canal de contacto se incorporarán en una siguiente etapa. No mostrar confirmaciones de envío hasta que exista y responda la integración real.
+WhatsApp Business confirmado: +51 908 917 621, enlace https://wa.me/51908917621. El formulario prepara un resumen local y permite abrir WhatsApp con ese texto o copiarlo. El usuario confirma el envío dentro de WhatsApp. No guarda leads en una base de datos; el backend se incorporará en una siguiente etapa. No mostrar confirmaciones de envío hasta que exista y responda la integración real.
 
 Para seguimiento de indexación: verificar el dominio en Search Console, enviar sitemap.xml e inspeccionar las URLs. Un sitemap y metadatos correctos no garantizan indexación ni posiciones.

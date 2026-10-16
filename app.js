@@ -56,6 +56,7 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(form);
   preview.textContent = `Hola, Vidrios VECA.\n\nSoy ${String(data.get('name')).trim()}.\nMi proyecto: ${data.get('project')}.\n\n${String(data.get('idea')).trim()}`;
+  document.querySelector('#whatsapp-request').href = 'https://wa.me/51908917621?text=' + encodeURIComponent(preview.textContent);
   document.querySelector('#copy-status').textContent = '';
   dialog.showModal();
 });

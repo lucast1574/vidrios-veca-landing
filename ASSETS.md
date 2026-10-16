@@ -1,11 +1,14 @@
-# Recursos visuales
+# Registro interno de recursos visuales
 
-El símbolo y la tipografía del logo fueron preparados a partir de la referencia entregada por el usuario. La entrada usa la animación WebP original, con el texto limpio.
+Fotos para mostrar usos del vidrio. No se atribuyen a VECA como obras propias ni se inventan clientes.
 
-Las imágenes son referenciales; no se presentan como trabajos ni clientes de Vidrios VECA.
+- fachada (`facade.webp`): Kyle Cleveland / Unsplash, https://unsplash.com/photos/OfDA_-Ysekc
+- detalle (`detail.webp`): Joshua Gandara / Unsplash, https://unsplash.com/photos/U0z0VBxXCEg
+- vivienda (`vivienda*.webp`): Curtis Adams / Pexels, https://www.pexels.com/photo/a-spacious-living-room-interior-design-8031899/
+- oficina (`oficina*.webp`): Bali Demiri / Pexels, https://www.pexels.com/photo/stylish-interior-of-modern-office-with-glass-walls-3801167/
+- mamparas (`mamparas*.webp`): Max Vakhtbovych / Pexels, https://www.pexels.com/photo/corridor-in-office-with-glass-walls-of-conference-room-6794926/
+- Licencias: https://unsplash.com/license y https://www.pexels.com/license/
+- `interior.webp`: visualización anterior de Aalo Lens / Unsplash, ya no utilizada en páginas públicas.
+- Manrope: SIL Open Font License en assets/Manrope-LICENSE.txt.
 
-- Fachada: Kyle Cleveland / Unsplash, https://unsplash.com/photos/OfDA_-Ysekc
-- Interior (visualización arquitectónica): Aalo Lens / Unsplash, https://unsplash.com/photos/Ez7fz5mavj0
-- Detalle de fachada: Joshua Gandara / Unsplash, https://unsplash.com/photos/U0z0VBxXCEg
-- Fotografías bajo Unsplash License: https://unsplash.com/license
-- Manrope: Google Fonts, SIL Open Font License.
+WebP optimizados con variantes pequeñas y dimensiones explícitas. Los créditos y decisiones de producción se conservan aquí, fuera del recorrido comercial.

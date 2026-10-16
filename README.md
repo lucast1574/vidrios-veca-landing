@@ -1,19 +1,22 @@
-# Vidrios VECA · landing de demostración
+# Vidrios VECA
 
-Una sola página, en español, adaptable a móvil y escritorio. Incluye el logo WebP animado como entrada, animaciones al hacer scroll, servicios desplegables y una consulta de ejemplo que no envía ni guarda datos.
+Sitio comercial estático de Vidrios VECA, con atención en toda Lima. Publicación principal: https://veca.com.pe/.
 
-Sin framework, dependencias JavaScript ni backend. Servida con Nginx en Dokploy.
+## Contenido y SEO
 
-## Vista local
+- Portada con marca, servicios, información de la empresa y preguntas frecuentes.
+- Guías de ventanas, edificios y remodelaciones con URLs independientes.
+- Canonical, metadatos sociales, datos estructurados Organization/WebSite/WebPage/Service y breadcrumbs.
+- robots.txt y sitemap.xml con las cuatro páginas públicas.
+- Redirección permanente de www y del hostname anterior al dominio principal.
+- Sin direcciones, teléfonos, redes, reseñas ni certificaciones inventadas.
 
-```sh
-python3 -m http.server 8780
-```
+## Ejecución
 
-## Despliegue
+Dockerfile de producción con Nginx en puerto 80 y endpoint /health. Configurar explícitamente el puerto 80 en Nexode. El contenedor sirve el contenido sin necesidad de JavaScript para leer los servicios.
 
-Dokploy: proyecto Vidrios VECA en la organización personal de Lucas, proveedor GitHub, rama main, build Dockerfile, puerto interno 80. Dominio de demo: https://veronica.santillan.pro.
+## Pendiente interno
 
-El formulario es de demostración. Antes de usar comercialmente, conectar un medio de contacto real y sustituir las imágenes referenciales por imágenes autorizadas del negocio.
+El formulario prepara un resumen local y permite copiarlo; no transmite ni guarda consultas. El backend y el canal de contacto se incorporarán en una siguiente etapa. No mostrar confirmaciones de envío hasta que exista y responda la integración real.
 
-Respeta prefers-reduced-motion. No incluye analytics, cookies ni datos de clientes.
+Para seguimiento de indexación: verificar el dominio en Search Console, enviar sitemap.xml e inspeccionar las URLs. Un sitemap y metadatos correctos no garantizan indexación ni posiciones.

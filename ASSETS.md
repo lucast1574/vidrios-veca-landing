@@ -12,3 +12,5 @@ Fotos para mostrar usos del vidrio. No se atribuyen a VECA como obras propias ni
 - Manrope: SIL Open Font License en assets/Manrope-LICENSE.txt.
 
 WebP optimizados con variantes pequeñas y dimensiones explícitas. Los créditos y decisiones de producción se conservan aquí, fuera del recorrido comercial.
+
+- `veca-compartir-v1.png`: tarjeta Open Graph 1200 × 630 con el logo original centrado sobre el color de marca. El logo queda dentro del recorte central cuadrado para vistas pequeñas. Se utiliza en las cuatro páginas públicas.

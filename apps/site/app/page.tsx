@@ -1,3 +1,4 @@
+import { homeSchema } from "../lib/home-schema";
 import Script from "next/script";
 import { CATEGORIES } from "@veca/content";
 import { legacy } from "../lib/legacy";
@@ -7,16 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { alternates: { canonical: "https://veca.com.pe/" } };
 export default async function Home() {
   const result = await projects({ featured: "true" }).catch(() => null);
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Vidrios VECA",
-    alternateName: "VECA",
-    url: "https://veca.com.pe",
-    logo: "https://veca.com.pe/assets/logo.svg",
-    telephone: "+51908917621",
-    areaServed: "Lima, Perú",
-  };
+
   return (
     <>
       <div className="scroll-progress" aria-hidden="true" />
@@ -62,7 +54,7 @@ export default async function Home() {
       <div dangerouslySetInnerHTML={{ __html: legacy.footer }} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema) }}
       />
       <Script src="/legacy.js" strategy="afterInteractive" />
     </>

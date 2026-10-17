@@ -20,7 +20,7 @@ try {
         role: "admin",
         passwordHash: null,
         setupHash: createHash("sha256").update(token).digest("hex"),
-        setupExpires: new Date(Date.now() + 3600_000),
+        setupExpires: new Date(Date.now() + 24 * 3600_000),
       },
       $setOnInsert: { username: "admin", createdAt: new Date() },
     },

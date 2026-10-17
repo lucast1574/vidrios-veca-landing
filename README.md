@@ -31,7 +31,7 @@ El control optimista de versión impide que dos pestañas se sobrescriban silenc
 
 ## Acceso
 
-Usuario inicial: `admin`. No existe contraseña universal ni registro público. Provisionar con `POST /auth/bootstrap` usando `ADMIN_BOOTSTRAP_KEY` de entropía alta desde un entorno de confianza. Devuelve un enlace de activación de un solo uso con vigencia de 24 horas. El cliente establece su propia contraseña (mínimo 12 caracteres); el token se consume. Si ya existe administrador no permite reemplazarlo. Alternativa operativa: `node scripts/bootstrap-admin.mjs` en el entorno privado de la API (enlace de 1 hora). Ningún token/contraseña debe guardarse en el repositorio, archivos de entrega ni registros de despliegue.
+Usuario inicial: `admin`. No existe contraseña universal ni registro público. Provisionar con `POST /auth/bootstrap` usando `ADMIN_BOOTSTRAP_KEY` de entropía alta desde un entorno de confianza. Devuelve un enlace de activación de un solo uso con vigencia de 24 horas. El cliente establece su propia contraseña (mínimo 12 caracteres); el token se consume. Si ya existe administrador no permite reemplazarlo. Alternativa operativa: `node scripts/bootstrap-admin.mjs` en el entorno privado de la API (enlace de 24 horas). Ningún token/contraseña debe guardarse en el repositorio, archivos de entrega ni registros de despliegue.
 
 Contraseñas Argon2, sesión opaca en cookie HttpOnly/Secure/SameSite, token CSRF y comprobación de Origin en escrituras autenticadas. No hay tokens de sesión en localStorage. Sesiones con expiración en MongoDB y cierre de sesión revocable.
 

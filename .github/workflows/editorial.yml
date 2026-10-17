@@ -1,0 +1,30 @@
+name: VECA editorial platform
+on:
+  push:
+    branches: [main, codex/editorial-platform]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Exercise authenticated publishing with MongoDB and S3-compatible storage
+        run: |
+          node scripts/local-qa.mjs > /tmp/veca-qa.log 2>&1 &
+          qa_pid=$!
+          trap 'kill -TERM "$qa_pid" || true' EXIT
+          curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:4400/health
+          curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:3380/health
+          node tests/bootstrap-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
+          node tests/api-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }

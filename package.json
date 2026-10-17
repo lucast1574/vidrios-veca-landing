@@ -1,0 +1,22 @@
+{
+  "name": "vidrios-veca",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @veca/content && npm run build -w @veca/api && npm run build -w @veca/panel && npm run build -w @veca/site",
+    "typecheck": "npm run build -w @veca/content && npm run typecheck --workspaces --if-present",
+    "test": "tsx --test tests/*.test.ts",
+    "start": "node scripts/start.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "3.7.4",
+    "s3rver": "3.7.1",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3"
+  }
+}

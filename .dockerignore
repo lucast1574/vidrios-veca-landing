@@ -1,5 +1,10 @@
 .git
-README.md
-ASSETS.md
-*.jpg
-node_modules
+**/node_modules
+**/.next
+**/dist
+.env
+.env.*
+**/*.log
+work
+outputs
+tests

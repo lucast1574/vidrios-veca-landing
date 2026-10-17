@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 work/
+.next/
+dist/
+.env.*
+*.tsbuildinfo

@@ -74,3 +74,7 @@ La landing antigua debe permanecer en producción hasta validar API, panel y el 
 `node tests/api-flow.mjs`: prueba la composición real HTTP/MongoDB/S3 compatible: sesión, CSRF, rechazo de archivos activos, privacidad de borradores/fotos, publicación, guardado concurrente, edición sin alterar lo público, búsqueda, SEO HTML, sitemap y retirada. Después validar la UI en navegador a 320, 390, tablet y escritorio.
 
 Si el proveedor pausa las nuevas activaciones S3, la API y el panel siguen permitiendo autenticación y borradores de texto. El panel indica el estado interno y la publicación exige fotos válidas: no se simula almacenamiento ni se usa otro bucket. `/health/ready` verifica MongoDB y S3; `/health` comprueba el proceso y MongoDB. Tras enlazar S3 desde Nexode se debe redeplegar la API.
+
+## Almacenamiento temporal compartido
+
+Si se utiliza temporalmente un bucket existente de otra cuenta autorizada, la API debe recibir una credencial independiente limitada a `veca/*`. Los objetos del proyecto se guardan bajo `veca/projects/`. La comprobación de disponibilidad usa `GetBucketLocation`, que permite verificar el bucket sin conceder acceso a listar archivos ajenos. La credencial principal y las de otras aplicaciones no se modifican. Al migrar al bucket propio se deben copiar y verificar los objetos antes de cambiar las variables y revocar la credencial temporal.

@@ -3,7 +3,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  HeadBucketCommand,
+  GetBucketLocationCommand,
 } from "@aws-sdk/client-s3";
 import { config } from "../common/config";
 @Injectable()
@@ -40,7 +40,7 @@ export class StorageService {
   }
   async check() {
     await this.client().send(
-      new HeadBucketCommand({ Bucket: config.S3_BUCKET }),
+      new GetBucketLocationCommand({ Bucket: config.S3_BUCKET }),
     );
   }
   put(key: string, body: Buffer) {

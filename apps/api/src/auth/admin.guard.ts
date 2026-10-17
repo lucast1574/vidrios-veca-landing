@@ -4,7 +4,8 @@ import {
   Injectable,
   ForbiddenException,
 } from "@nestjs/common";
-import { AuthService, equal } from "./auth.service";
+import { AuthService } from "./auth.service";
+import { equal } from "./auth.crypto";
 import type { AuthenticatedRequest } from "./auth.types";
 import { config } from "../common/config";
 @Injectable()

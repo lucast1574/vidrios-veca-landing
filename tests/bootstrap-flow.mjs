@@ -21,6 +21,14 @@ try {
     key: "not-authorized-even-if-it-is-long-enough",
   });
   assert.equal(r.status, 403);
+  assert.equal(
+    (
+      await call("/auth/bootstrap", {
+        key: "ñ".repeat("local-qa-bootstrap-key-only-at-least-32".length),
+      })
+    ).status,
+    403,
+  );
   r = await call("/auth/bootstrap", {
     key: "local-qa-bootstrap-key-only-at-least-32",
   });

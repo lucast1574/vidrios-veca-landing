@@ -4,7 +4,7 @@ import {
   ForbiddenException,
   ConflictException,
 } from "@nestjs/common";
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { hash, verify } from "argon2";
 import { ObjectId } from "mongodb";
 import { Database } from "../database/database.module";
@@ -13,10 +13,7 @@ import type {
   SessionDocument,
   AuthenticatedSession,
 } from "./auth.types";
-export const digest = (s: string) =>
-  createHash("sha256").update(s).digest("hex");
-export const equal = (a: string, b: string) =>
-  a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+import { digest, equal } from "./auth.crypto";
 @Injectable()
 export class AuthService {
   constructor(private readonly database: Database) {}

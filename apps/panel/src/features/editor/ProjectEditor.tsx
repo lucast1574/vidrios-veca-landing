@@ -311,15 +311,27 @@ export function ProjectEditor({
                 images={draft.images}
                 coverId={draft.coverId}
                 onChange={(images) => {
-                  setDraft((old) => ({
-                    ...old,
-                    images,
-                    body: removeMissingImages(
-                      old.body,
-                      new Set(images.map((i) => i.id)),
-                    ),
-                  }));
+                  setDraft((old) => {
+                    const nextImages =
+                      typeof images === "function"
+                        ? images(old.images)
+                        : images;
+                    return {
+                      ...old,
+                      images: nextImages,
+                      coverId: nextImages.some(
+                        (image) => image.id === old.coverId,
+                      )
+                        ? old.coverId
+                        : nextImages[0]?.id || null,
+                      body: removeMissingImages(
+                        old.body,
+                        new Set(nextImages.map((i) => i.id)),
+                      ),
+                    };
+                  });
                   setDirty(true);
+                  setNotice("");
                 }}
                 onCover={(id) => patch("coverId", id)}
                 onInsert={(image, layout) => insert.current(image, layout)}

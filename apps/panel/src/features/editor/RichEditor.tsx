@@ -61,6 +61,11 @@ export function RichEditor({
     },
   });
   useEffect(() => {
+    if (editor && JSON.stringify(editor.getJSON()) !== JSON.stringify(value)) {
+      editor.commands.setContent(value, { emitUpdate: false });
+    }
+  }, [editor, value]);
+  useEffect(() => {
     if (editor)
       onReady((image, layout) =>
         editor

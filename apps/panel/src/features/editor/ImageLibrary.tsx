@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {
   ImagePlus,
   ArrowUp,
@@ -18,7 +18,7 @@ export function ImageLibrary({
 }: {
   images: Media[];
   coverId: string | null;
-  onChange: (images: Media[]) => void;
+  onChange: Dispatch<SetStateAction<Media[]>>;
   onCover: (id: string | null) => void;
   onInsert: (image: Media, layout: string) => void;
 }) {
@@ -27,7 +27,9 @@ export function ImageLibrary({
   const [error, setError] = useState("");
   const [active, setActive] = useState<string | null>(null);
   const update = (id: string, patch: Partial<Media>) =>
-    onChange(images.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    onChange((current) =>
+      current.map((i) => (i.id === id ? { ...i, ...patch } : i)),
+    );
   async function upload(files: FileList | null) {
     if (!files) return;
     setError("");
@@ -49,8 +51,7 @@ export function ImageLibrary({
       setError((e as Error).message);
     } finally {
       if (added.length) {
-        onChange([...images, ...added]);
-        if (!coverId) onCover(added[0].id);
+        onChange((current) => [...current, ...added]);
         setActive(added[0].id);
       }
       setBusy(false);
@@ -208,10 +209,17 @@ export function ImageLibrary({
                 disabled={images[0].id === selected.id}
                 aria-label="Mover foto antes"
                 onClick={() => {
-                  const i = images.indexOf(selected),
-                    copy = [...images];
-                  [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
-                  onChange(copy);
+                  onChange((current) => {
+                    const i = current.findIndex(
+                      (image) => image.id === selected.id,
+                    );
+                    const target = i + -1;
+                    if (i < 0 || target < 0 || target >= current.length)
+                      return current;
+                    const copy = [...current];
+                    [copy[target], copy[i]] = [copy[i], copy[target]];
+                    return copy;
+                  });
                 }}
               >
                 <ArrowUp size={16} />
@@ -222,10 +230,17 @@ export function ImageLibrary({
                 disabled={images.at(-1)?.id === selected.id}
                 aria-label="Mover foto después"
                 onClick={() => {
-                  const i = images.indexOf(selected),
-                    copy = [...images];
-                  [copy[i + 1], copy[i]] = [copy[i], copy[i + 1]];
-                  onChange(copy);
+                  onChange((current) => {
+                    const i = current.findIndex(
+                      (image) => image.id === selected.id,
+                    );
+                    const target = i + 1;
+                    if (i < 0 || target < 0 || target >= current.length)
+                      return current;
+                    const copy = [...current];
+                    [copy[target], copy[i]] = [copy[i], copy[target]];
+                    return copy;
+                  });
                 }}
               >
                 <ArrowDown size={16} />
@@ -237,11 +252,9 @@ export function ImageLibrary({
                 onClick={() => {
                   if (!confirm("¿Quitar esta foto del proyecto y del texto?"))
                     return;
-                  onChange(images.filter((i) => i.id !== selected.id));
-                  if (coverId === selected.id)
-                    onCover(
-                      images.find((i) => i.id !== selected.id)?.id || null,
-                    );
+                  onChange((current) =>
+                    current.filter((i) => i.id !== selected.id),
+                  );
                   setActive(null);
                 }}
               >

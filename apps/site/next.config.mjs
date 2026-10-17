@@ -1,5 +1,4 @@
 export default {
-  output: "standalone",
   trailingSlash: true,
   transpilePackages: ["@veca/ui"],
   poweredByHeader: false,

@@ -11,11 +11,11 @@ COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build && npm prune --omit=dev --ignore-scripts && rm -rf apps/site/.next/cache
+RUN npm run build && npm prune --omit=dev --ignore-scripts && rm -rf apps/site/.next/cache apps/site/.next/standalone
 FROM node:24-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 APP_ROLE=site
-COPY --from=build --chown=node:node /app /app
+COPY --from=build /app /app
 USER node
 EXPOSE 80 3000 4000
 CMD ["node","scripts/start.mjs"]

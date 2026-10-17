@@ -128,6 +128,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState("");
+  const [storageConfigured, setStorageConfigured] = useState(true);
   const [editing, setEditing] = useState<Project | null | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -150,7 +151,12 @@ export default function App() {
       .finally(() => setLoading(false));
   }, []);
   useEffect(() => {
-    if (session) void refresh();
+    if (session) {
+      void refresh();
+      void api<{ storageConfigured: boolean }>("/admin/system")
+        .then((x) => setStorageConfigured(x.storageConfigured))
+        .catch(() => {});
+    }
   }, [session]);
   const filtered = useMemo(
     () =>
@@ -240,6 +246,13 @@ export default function App() {
             Espacio privado
           </span>
         </div>
+        {!storageConfigured && (
+          <Notice>
+            El almacenamiento de fotografías está pendiente de activación en
+            Nexode. Puedes preparar y guardar los textos; la publicación se
+            habilita con una portada.
+          </Notice>
+        )}
         {editing !== undefined ? (
           <ProjectEditor
             key={editing?.id || "new"}

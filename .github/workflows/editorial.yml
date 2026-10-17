@@ -26,5 +26,6 @@ jobs:
           trap 'kill -TERM "$qa_pid" || true' EXIT
           curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:4400/health
           curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:3380/health
+          node tests/storage-unavailable.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/bootstrap-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/api-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }

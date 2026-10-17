@@ -6,6 +6,9 @@ const dbClient = new MongoClient("mongodb://127.0.0.1:27099");
 await dbClient.connect();
 const db = dbClient.db("veca_qa");
 try {
+  const ready = await fetch(api + "/health/ready");
+  assert.equal(ready.status, 200);
+  assert.equal((await ready.json()).storage, "connected");
   await db.collection("users").deleteMany({});
   await db.collection("sessions").deleteMany({});
   const call = (route, data) =>

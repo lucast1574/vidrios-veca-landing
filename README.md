@@ -72,3 +72,5 @@ La landing antigua debe permanecer en producción hasta validar API, panel y el 
 `node scripts/local-qa.mjs`: MongoDB 8 efímero y S3rver local, API 4400, panel 3300 y sitio 3380. Crea únicamente la cuenta de prueba local definida en ese script. No usar sus datos en producción.
 
 `node tests/api-flow.mjs`: prueba la composición real HTTP/MongoDB/S3 compatible: sesión, CSRF, rechazo de archivos activos, privacidad de borradores/fotos, publicación, guardado concurrente, edición sin alterar lo público, búsqueda, SEO HTML, sitemap y retirada. Después validar la UI en navegador a 320, 390, tablet y escritorio.
+
+Si el proveedor pausa las nuevas activaciones S3, la API y el panel siguen permitiendo autenticación y borradores de texto. El panel indica el estado interno y la publicación exige fotos válidas: no se simula almacenamiento ni se usa otro bucket. `/health/ready` verifica MongoDB y S3; `/health` comprueba el proceso y MongoDB. Tras enlazar S3 desde Nexode se debe redeplegar la API.

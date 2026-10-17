@@ -19,7 +19,7 @@ export default async function Home() {
           <div className="project-showcase-heading">
             <div>
               <p className="eyebrow">
-                <span className="section-number">02</span> PROYECTOS VECA
+                <span className="section-number">01</span> PROYECTOS VECA
               </p>
               <h2>
                 Del primer detalle.

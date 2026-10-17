@@ -24,6 +24,10 @@ export async function api<T>(
     ...options,
     headers,
     credentials: "include",
+  }).catch(() => {
+    throw new Error(
+      "No pudimos conectar con el servidor. Inténtalo nuevamente en unos momentos.",
+    );
   });
   const body = await res.json().catch(() => ({
     message: "El servidor no respondió. Inténtalo nuevamente.",

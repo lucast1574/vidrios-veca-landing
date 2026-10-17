@@ -182,6 +182,16 @@ assert.equal(
     .title,
   draft.title,
 );
+const homeHtml = await (
+  await fetch(process.env.TEST_SITE_URL || "http://localhost:3380")
+).text();
+assert.ok(
+  homeHtml.indexOf('id="proyectos"') < homeHtml.indexOf('id="soluciones"'),
+);
+assert.ok(homeHtml.includes(draft.title));
+assert.ok(!homeHtml.includes(update.title));
+assert.ok(!homeHtml.includes("panel.veca.com.pe"));
+assert.ok(homeHtml.includes("https://wa.me/51908917621"));
 const html = await (
   await fetch(
     (process.env.TEST_SITE_URL || "http://localhost:3380") +

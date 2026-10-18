@@ -124,3 +124,11 @@ feedback uses color/background/contrast changes; focus outlines and rings are
 intentionally excluded from the public site and panel.
 
 `node tests/access-flow.mjs`: verifica códigos y correo de prueba, aprobación externa, dominio corporativo exacto, límites de roles en sesiones abiertas, privacidad de fotos, recuperación, suspensión y control de concurrencia de códigos. Ejecutar después del arranque limpio de QA; los límites de intentos están activos también durante estas pruebas.
+
+### Frontera de acceso de la API
+
+Un guard global protege todos los handlers. Cada endpoint público debe declarar `PublicEndpoint`; el resto exige una sesión y un permiso explícito con `RequirePermission`, o `SessionEndpoint` para consultar/cerrar la propia sesión pendiente. Un handler sin declaración se deniega incluso al administrador. Las categorías, publicaciones, fotografías publicadas, formulario de consulta, autenticación y comprobaciones mínimas de salud son públicos por necesidad; los borradores, archivos privados, usuarios, contactos y movimientos de almacén no lo son. Las fotos pasan además por la comprobación de publicación de `MediaService`.
+
+`POST /auth/bootstrap` responde 404 en producción; las invitaciones se crean únicamente desde el entorno privado de confianza. Una invitación con rol asignado no evita la verificación del correo: un administrador externo invitado se activa al acreditar la identidad con Google o código, sin conceder autoaprobación a otros externos.
+
+`node tests/security-flow.mjs` comprueba todos los métodos privados sin sesión, la denegación de handlers sin metadatos, permisos y CSRF, invitaciones externas y el cierre del bootstrap en producción.

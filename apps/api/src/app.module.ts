@@ -1,4 +1,4 @@
-import { Controller, Get, Module, Res, UseGuards } from "@nestjs/common";
+import { Controller, Get, Module, Res } from "@nestjs/common";
 import type { Response } from "express";
 import { DatabaseModule, Database } from "./database/database.module";
 import { AccessModule } from "./access/access.controller";
@@ -7,7 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { ProjectsModule } from "./projects/projects.module";
 import { MediaModule } from "./media/media.module";
 import { CrmModule } from "./crm/crm.controller";
-import { AdminGuard } from "./auth/admin.guard";
+import { PublicEndpoint, RequirePermission } from "./auth/route-access";
 import { StorageService } from "./media/storage.service";
 @Controller()
 class HealthController {
@@ -15,16 +15,19 @@ class HealthController {
     private readonly database: Database,
     private readonly storage: StorageService,
   ) {}
-  @Get("health") async health(@Res({ passthrough: true }) res: Response) {
+  @PublicEndpoint()
+  @Get("health")
+  async health(@Res({ passthrough: true }) res: Response) {
     res.setHeader("X-Robots-Tag", "noindex");
     await this.database.db.command({ ping: 1 });
     return { status: "ok" };
   }
-  @UseGuards(AdminGuard)
+  @RequirePermission("dashboard")
   @Get("admin/system")
   system() {
     return { storageConfigured: this.storage.configured };
   }
+  @PublicEndpoint()
   @Get("health/ready")
   async ready(@Res({ passthrough: true }) res: Response) {
     res.setHeader("X-Robots-Tag", "noindex");

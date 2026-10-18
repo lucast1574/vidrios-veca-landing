@@ -11,7 +11,6 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
   Sse,
   BadRequestException,
@@ -20,7 +19,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import type { Response } from "express";
 import { Readable } from "node:stream";
 import { z } from "zod";
-import { AdminGuard } from "../auth/admin.guard";
+import { PublicEndpoint, RequirePermission } from "../auth/route-access";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { AuthModule } from "../auth/auth.module";
 import { MediaModule } from "../media/media.module";
@@ -32,11 +31,13 @@ import { InventoryService } from "../inventory/inventory.service";
 @Controller("public/consultations")
 class ConsultationController {
   constructor(private readonly crm: CrmService) {}
-  @Post() create(@Body() body: unknown) {
+  @PublicEndpoint()
+  @Post()
+  create(@Body() body: unknown) {
     return this.crm.create(body);
   }
 }
-@UseGuards(AdminGuard)
+@RequirePermission("leads")
 @Controller("admin/crm")
 class CrmController {
   constructor(
@@ -45,7 +46,9 @@ class CrmController {
     private readonly inventory: InventoryService,
     private readonly events: CrmEvents,
   ) {}
-  @Sse("events") stream() {
+  @RequirePermission("dashboard")
+  @Sse("events")
+  stream() {
     return this.events.stream;
   }
   @Get("leads") list(
@@ -125,13 +128,19 @@ class CrmController {
     });
     (file.Body as Readable).pipe(res);
   }
-  @Get("materials") materials(@Query("search") search = "") {
+  @RequirePermission("inventory")
+  @Get("materials")
+  materials(@Query("search") search = "") {
     return this.inventory.list(search);
   }
-  @Post("materials") createMaterial(@Body() body: unknown) {
+  @RequirePermission("inventory")
+  @Post("materials")
+  createMaterial(@Body() body: unknown) {
     return this.inventory.create(body);
   }
-  @Get("movements") movements(
+  @RequirePermission("inventory")
+  @Get("movements")
+  movements(
     @Query("leadId") leadId?: string,
     @Query("materialId") materialId?: string,
     @Query("page") page = "1",
@@ -141,7 +150,9 @@ class CrmController {
       throw new BadRequestException("Página inválida.");
     return this.inventory.movements(leadId, materialId, p);
   }
-  @Post("materials/:id/movements") move(
+  @RequirePermission("inventory")
+  @Post("materials/:id/movements")
+  move(
     @Param("id") id: string,
     @Body() body: unknown,
     @Req() req: AuthenticatedRequest,

@@ -1,23 +1,14 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { z } from "zod";
 import { CATEGORIES, TAGS } from "@veca/content";
-import { AdminGuard } from "../auth/admin.guard";
+import { PublicEndpoint, RequirePermission } from "../auth/route-access";
 import { ProjectsService } from "./projects.service";
 import { parse } from "../common/validation";
 const versionSchema = z
   .object({ version: z.number().int().positive() })
   .strict();
 @Controller("admin/projects")
-@UseGuards(AdminGuard)
+@RequirePermission("projects")
 export class ProjectsController {
   constructor(private readonly projects: ProjectsService) {}
   @Get() list() {
@@ -48,10 +39,14 @@ export class ProjectsController {
 @Controller("public")
 export class PublicProjectsController {
   constructor(private readonly projects: ProjectsService) {}
-  @Get("taxonomy") taxonomy() {
+  @PublicEndpoint()
+  @Get("taxonomy")
+  taxonomy() {
     return { categories: CATEGORIES, tags: TAGS };
   }
-  @Get("projects") list(@Query() input: unknown) {
+  @PublicEndpoint()
+  @Get("projects")
+  list(@Query() input: unknown) {
     const q = parse(
       z.object({
         q: z.string().max(120).default(""),
@@ -68,10 +63,14 @@ export class PublicProjectsController {
       q.page,
     );
   }
-  @Get("sitemap") sitemap() {
+  @PublicEndpoint()
+  @Get("sitemap")
+  sitemap() {
     return this.projects.sitemap();
   }
-  @Get("projects/:slug") get(@Param("slug") slug: string) {
+  @PublicEndpoint()
+  @Get("projects/:slug")
+  get(@Param("slug") slug: string) {
     return this.projects.publicOne(slug);
   }
 }

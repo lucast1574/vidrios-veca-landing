@@ -3,13 +3,17 @@ import {
   ForbiddenException,
   Injectable,
 } from "@nestjs/common";
-import type { Permission } from "@veca/content";
+import { Reflector } from "@nestjs/core";
+import { ROUTE_ACCESS, type RouteAccess } from "./route-access";
 import { AuthService } from "./auth.service";
 import { SessionGuard } from "./session.guard";
 import type { AuthenticatedRequest } from "./auth.types";
 @Injectable()
 export class AdminGuard extends SessionGuard {
-  constructor(auth: AuthService) {
+  constructor(
+    auth: AuthService,
+    private readonly reflector: Reflector,
+  ) {
     super(auth);
   }
   async canActivate(context: ExecutionContext) {
@@ -20,23 +24,14 @@ export class AdminGuard extends SessionGuard {
       throw new ForbiddenException(
         "Tu cuenta está pendiente de aprobación o no tiene acceso activo.",
       );
-    const path = req.path;
-    let permission: Permission | undefined;
-    if (path.startsWith("/admin/users")) permission = "users";
-    else if (path.startsWith("/admin/dashboard")) permission = "dashboard";
-    else if (path.startsWith("/admin/projects") || path.startsWith("/media"))
-      permission = "projects";
-    else if (
-      path.startsWith("/admin/crm/materials") ||
-      path.startsWith("/admin/crm/movements")
+    const access = this.reflector.getAllAndOverride<RouteAccess>(ROUTE_ACCESS, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (
+      access?.kind !== "permission" ||
+      !user.permissions.includes(access.permission)
     )
-      permission = "inventory";
-    else if (
-      path.startsWith("/admin/crm/leads") ||
-      path.startsWith("/admin/crm/files")
-    )
-      permission = "leads";
-    if (permission && !user.permissions.includes(permission))
       throw new ForbiddenException("Tu rol no permite acceder a esta sección.");
     return true;
   }

@@ -5,13 +5,12 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
   ForbiddenException,
 } from "@nestjs/common";
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { AuthService } from "./auth.service";
-import { SessionGuard } from "./session.guard";
+import { PublicEndpoint, SessionEndpoint } from "./route-access";
 import { MailService } from "../mail/mail.service";
 import { parse } from "../common/validation";
 import { config } from "../common/config";
@@ -49,7 +48,9 @@ export class AuthController {
     });
     return { user: s.user, csrf: s.csrf };
   }
-  @Get("config") settings() {
+  @PublicEndpoint()
+  @Get("config")
+  settings() {
     return {
       emailRegistrationAvailable: this.mail.configured,
       google:
@@ -63,7 +64,9 @@ export class AuthController {
           : null,
     };
   }
-  @Post("register") async register(@Body() body: unknown, @Req() req: Request) {
+  @PublicEndpoint()
+  @Post("register")
+  async register(@Body() body: unknown, @Req() req: Request) {
     this.origin(req);
     const d = parse(
       z
@@ -77,7 +80,9 @@ export class AuthController {
     );
     return this.auth.register(d.name, d.email, d.password);
   }
-  @Post("verify") async verify(
+  @PublicEndpoint()
+  @Post("verify")
+  async verify(
     @Body() body: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -94,7 +99,9 @@ export class AuthController {
     );
     return this.respond(res, await this.auth.confirm(d.challenge, d.code));
   }
-  @Post("google") async google(
+  @PublicEndpoint()
+  @Post("google")
+  async google(
     @Body() body: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -106,7 +113,9 @@ export class AuthController {
     );
     return this.respond(res, await this.auth.google(d.idToken));
   }
-  @Post("forgot") async forgot(@Body() body: unknown, @Req() req: Request) {
+  @PublicEndpoint()
+  @Post("forgot")
+  async forgot(@Body() body: unknown, @Req() req: Request) {
     this.origin(req);
     const d = parse(
       z.object({ email: z.string().trim().email().max(180) }).strict(),
@@ -114,7 +123,9 @@ export class AuthController {
     );
     return this.auth.forgot(d.email);
   }
-  @Post("reset") async reset(
+  @PublicEndpoint()
+  @Post("reset")
+  async reset(
     @Body() body: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -135,6 +146,7 @@ export class AuthController {
       await this.auth.reset(d.challenge, d.code, d.password),
     );
   }
+  @PublicEndpoint()
   @Post("bootstrap")
   async bootstrap(@Body() input: unknown) {
     const value = parse(
@@ -143,7 +155,9 @@ export class AuthController {
     );
     return this.auth.prepareAdmin(value.key);
   }
-  @Post("login") async login(
+  @PublicEndpoint()
+  @Post("login")
+  async login(
     @Body() input: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -152,7 +166,9 @@ export class AuthController {
     const d = parse(login, input);
     return this.respond(res, await this.auth.login(d.username, d.password));
   }
-  @Post("activate") async activate(
+  @PublicEndpoint()
+  @Post("activate")
+  async activate(
     @Body() input: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -161,10 +177,10 @@ export class AuthController {
     const d = parse(activation, input);
     return this.respond(res, await this.auth.setup(d.token, d.password));
   }
-  @UseGuards(SessionGuard) @Get("me") me(@Req() req: AuthenticatedRequest) {
+  @SessionEndpoint() @Get("me") me(@Req() req: AuthenticatedRequest) {
     return { user: req.session.user, csrf: req.session.csrf };
   }
-  @UseGuards(SessionGuard) @Post("logout") async logout(
+  @SessionEndpoint() @Post("logout") async logout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {

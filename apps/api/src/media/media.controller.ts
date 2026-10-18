@@ -6,19 +6,18 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import type { Response, Request } from "express";
 import { Readable } from "node:stream";
 import { MediaService } from "./media.service";
-import { AdminGuard } from "../auth/admin.guard";
+import { PublicEndpoint, RequirePermission } from "../auth/route-access";
 @Controller("media")
 export class MediaController {
   constructor(private readonly media: MediaService) {}
   @Post()
-  @UseGuards(AdminGuard)
+  @RequirePermission("projects")
   @UseInterceptors(
     FileInterceptor("file", {
       limits: { fileSize: 12 * 1024 * 1024, files: 1, fields: 0 },
@@ -27,7 +26,9 @@ export class MediaController {
   upload(@UploadedFile() file: Express.Multer.File) {
     return this.media.upload(file);
   }
-  @Get(":id") async read(
+  @PublicEndpoint()
+  @Get(":id")
+  async read(
     @Param("id") id: string,
     @Req() req: Request,
     @Res() res: Response,

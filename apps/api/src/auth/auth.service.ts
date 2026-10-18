@@ -5,6 +5,7 @@ import {
   ConflictException,
   BadRequestException,
   ServiceUnavailableException,
+  NotFoundException,
 } from "@nestjs/common";
 import { randomBytes } from "node:crypto";
 import { hash, verify } from "argon2";
@@ -50,6 +51,7 @@ export class AuthService {
     };
   }
   async prepareAdmin(key: string) {
+    if (config.NODE_ENV === "production") throw new NotFoundException();
     if (!config.ADMIN_BOOTSTRAP_KEY || !equal(key, config.ADMIN_BOOTSTRAP_KEY))
       throw new ForbiddenException();
     if (await this.users.findOne({ username: "admin" }))
@@ -131,8 +133,10 @@ export class AuthService {
     const user = await this.users.findOne({ _id: userId });
     if (!user) throw new UnauthorizedException();
     const corporate = user.email?.split("@")[1] === "veca.com.pe";
+    const invited =
+      user.trustedInvitation && !!user.role && user.status === "pending";
     const auto =
-      corporate &&
+      (corporate || invited) &&
       (!user.emailVerified || user.status === "pending") &&
       user.status !== "suspended" &&
       user.status !== "rejected";
@@ -145,7 +149,9 @@ export class AuthService {
             status: "active",
             role:
               user.trustedInvitation && user.role ? user.role : "management",
-            approvedBy: "Dominio corporativo verificado",
+            approvedBy: invited
+              ? "Invitación verificada"
+              : "Dominio corporativo verificado",
             approvedAt: new Date(),
           }
         : {}),

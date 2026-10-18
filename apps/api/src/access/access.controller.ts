@@ -7,7 +7,6 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -18,12 +17,12 @@ import { ROLES, roleSchema, accountStatusSchema } from "@veca/content";
 import { Database } from "../database/database.module";
 import { AuthModule } from "../auth/auth.module";
 import { AuthService } from "../auth/auth.service";
-import { AdminGuard } from "../auth/admin.guard";
+import { RequirePermission } from "../auth/route-access";
 import type { AuthenticatedRequest, UserDocument } from "../auth/auth.types";
 import { parse } from "../common/validation";
 import { MailService } from "../mail/mail.service";
 import { panelAction } from "../mail/templates";
-@UseGuards(AdminGuard)
+@RequirePermission("users")
 @Controller("admin/users")
 class UsersController {
   constructor(
@@ -165,7 +164,7 @@ class UsersController {
     return { ...this.auth.view(saved), revision: saved.revision };
   }
 }
-@UseGuards(AdminGuard)
+@RequirePermission("dashboard")
 @Controller("admin/dashboard")
 class DashboardController {
   constructor(

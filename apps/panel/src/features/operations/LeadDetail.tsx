@@ -282,7 +282,7 @@ export function LeadDetail({
           }}
         >
           <ArrowLeft size={17} />
-          Oportunidades
+          Leads
         </button>
         <div>
           <span className={`ops-ticket ticket-${lead.segment}`}>
@@ -431,9 +431,9 @@ export function LeadDetail({
           </section>
           <aside className="ops-card ops-detail-save">
             <h3>Seguimiento comercial</h3>
-            <Field label="Tipo de oportunidad">
+            <Field label="Tipo de lead">
               <Select
-                label="Tipo de oportunidad"
+                label="Tipo de lead"
                 value={draft.segment}
                 onChange={(v) => patch("segment", v as LeadInput["segment"])}
                 options={LEAD_SEGMENTS.map((s) => ({

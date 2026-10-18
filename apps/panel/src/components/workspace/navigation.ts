@@ -11,7 +11,7 @@ export const WORKSPACE_ITEMS = [
   },
   {
     id: "leads",
-    label: "Oportunidades",
+    label: "Leads",
     description: "Consultas y obras",
     Icon: Kanban,
     group: "Seguimiento",

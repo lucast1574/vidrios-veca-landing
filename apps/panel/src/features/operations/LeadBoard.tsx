@@ -112,13 +112,12 @@ export function LeadBoard({
             <br />a la última instalación.
           </h1>
           <span>
-            Contactos, coordinación y avance de cada oportunidad en un solo
-            lugar.
+            Contactos, coordinación y avance de cada lead en un solo lugar.
           </span>
         </div>
         <Button onClick={() => setCreate(!create)}>
           <Plus size={17} />
-          {create ? "Cerrar formulario" : "Registrar oportunidad"}
+          {create ? "Cerrar formulario" : "Registrar lead"}
         </Button>
       </div>
       <div className="ops-summary">
@@ -137,7 +136,7 @@ export function LeadBoard({
       )}
       {create && (
         <form className="ops-card ops-create-form" onSubmit={add}>
-          <h2>Registrar una oportunidad</h2>
+          <h2>Registrar una lead</h2>
           <div className="ops-form-grid">
             {[
               ["name", "Nombre y apellido", "text"],
@@ -179,14 +178,14 @@ export function LeadBoard({
         <label className="search-input">
           <Search size={17} />
           <input
-            aria-label="Buscar oportunidades"
+            aria-label="Buscar leads"
             placeholder="Nombre, teléfono, correo o distrito…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </label>
         <Select
-          label="Filtrar por tipo de oportunidad"
+          label="Filtrar por tipo de lead"
           value={segment}
           onChange={setSegment}
           options={[
@@ -202,7 +201,7 @@ export function LeadBoard({
           <RefreshCw size={18} />
         </button>
       </div>
-      <div className="ops-kanban" aria-label="Tablero de oportunidades">
+      <div className="ops-kanban" aria-label="Tablero de leads">
         {LEAD_STAGES.map((stage) => {
           const group = items.filter((l) => l.stage === stage.id);
           return (
@@ -285,9 +284,7 @@ export function LeadBoard({
                 ))}
                 {!group.length && (
                   <p className="ops-column-empty">
-                    {data
-                      ? "Sin oportunidades en esta etapa"
-                      : "Cargando tablero…"}
+                    {data ? "Sin leads en esta etapa" : "Cargando tablero…"}
                   </p>
                 )}
               </div>
@@ -303,7 +300,7 @@ export function LeadBoard({
         </p>
         {data && (
           <span>
-            Mostrando {data.items.length} de {data.total} oportunidades
+            Mostrando {data.items.length} de {data.total} leads
           </span>
         )}
         {data && data.items.length < data.total && (

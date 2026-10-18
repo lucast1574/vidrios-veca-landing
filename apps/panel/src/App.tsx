@@ -155,6 +155,9 @@ export default function App() {
           user={session.user}
           onLogout={logout}
           onNavigate={navigate}
+          onUpdate={(user) =>
+            setSession((current) => (current ? { ...current, user } : null))
+          }
         />
       ) : !active ? (
         <PendingAccess

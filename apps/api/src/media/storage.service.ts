@@ -1,6 +1,7 @@
 import { Injectable, ServiceUnavailableException } from "@nestjs/common";
 import {
   S3Client,
+  DeleteObjectCommand,
   PutObjectCommand,
   GetObjectCommand,
   GetBucketLocationCommand,
@@ -51,6 +52,11 @@ export class StorageService {
         Body: body,
         ContentType: contentType,
       }),
+    );
+  }
+  remove(key: string) {
+    return this.client().send(
+      new DeleteObjectCommand({ Bucket: config.S3_BUCKET, Key: key }),
     );
   }
   get(key: string) {

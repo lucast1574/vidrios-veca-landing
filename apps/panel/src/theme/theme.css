@@ -1,0 +1,541 @@
+:root {
+  --panel-canvas: #f5f4f0;
+  --panel-surface: #fff;
+  --panel-soft: #faf9f6;
+  --panel-raised: #eeede8;
+  --panel-ink: #242641;
+  --panel-secondary: #646879;
+  --panel-muted: #858894;
+  --panel-edge: #e6e4de;
+  --panel-accent: #c34427;
+  --panel-accent-soft: #f9e9e2;
+}
+:root[data-theme="dark"] {
+  --panel-canvas: #151722;
+  --panel-surface: #202331;
+  --panel-soft: #1a1d29;
+  --panel-raised: #2a2e3e;
+  --panel-ink: #eeeef5;
+  --panel-secondary: #b5b9ca;
+  --panel-muted: #9499af;
+  --panel-edge: #35394b;
+  --panel-accent: #ff9678;
+  --panel-accent-soft: #402d2b;
+}
+body {
+  background: var(--panel-canvas);
+  color: var(--panel-ink);
+}
+.profile-photo-settings {
+  margin-bottom: 24px;
+}
+.profile-photo-settings .workspace-avatar-large {
+  margin-bottom: 16px;
+}
+.profile-photo-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #ffffff30;
+  border-radius: 8px;
+  background: #ffffff12;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+.profile-photo-upload:hover,
+.profile-photo-upload:focus-visible {
+  background: #ffffff26;
+  filter: none;
+  outline: none;
+  box-shadow: none;
+}
+.profile-photo-settings > p {
+  font-size: 10px;
+  color: #bcc0d3;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.profile-photo-settings > small {
+  display: block;
+  color: #bcc0d3;
+  font-size: 10px;
+  margin-top: 10px;
+}
+.profile-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+}
+.profile-photo-actions button {
+  background: none;
+  border: 0;
+  padding: 2px 0;
+  color: #ececf4;
+  font-size: 10px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  min-height: 32px;
+}
+.profile-photo-actions button:focus-visible {
+  color: #ffb29a;
+  filter: none;
+}
+.profile-photo-settings .profile-photo-error {
+  color: #ffc0ac;
+}
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.theme-options > button {
+  padding: 8px 8px 12px;
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--panel-secondary);
+  min-width: 0;
+}
+.theme-options > button:hover,
+.theme-options > button:focus-visible {
+  background: var(--panel-raised);
+  color: var(--panel-ink);
+  outline: none;
+  box-shadow: none;
+  filter: none;
+}
+.theme-options > button[aria-pressed="true"] {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
+  border-color: var(--panel-accent-soft);
+}
+.theme-options > button > span:last-child {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+.theme-swatch {
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  grid-template-rows: 12px 1fr;
+  gap: 5px;
+  padding: 7px;
+  min-height: 60px;
+  border-radius: 5px;
+  background: #f3f2ee;
+  border: 1px solid #d9d8d5;
+}
+.theme-swatch i {
+  display: block;
+  border-radius: 2px;
+  background: #d9d9dc;
+}
+.theme-swatch i:first-child {
+  grid-row: 1/3;
+  background: #e6e4df;
+}
+.theme-swatch i:last-child {
+  background: #fff;
+}
+.swatch-dark {
+  background: #151722;
+  border-color: #3b4052;
+}
+.swatch-dark i {
+  background: #32374b;
+}
+.swatch-dark i:first-child {
+  background: #232736;
+}
+.swatch-dark i:last-child {
+  background: #2a2e40;
+}
+.swatch-system {
+  background: linear-gradient(90deg, #f3f2ee 50%, #151722 50%);
+  border-color: #6f7381;
+}
+.swatch-system i:last-child {
+  background: linear-gradient(90deg, #fff 40%, #2a2e40 40%);
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+  color: var(--panel-ink);
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: var(--panel-muted);
+}
+html[data-theme="dark"] .btn-ghost {
+  background: var(--panel-surface);
+  border-color: var(--panel-edge);
+  color: var(--panel-ink);
+}
+html[data-theme="dark"] .btn-ghost:hover,
+html[data-theme="dark"] .btn-ghost:focus-visible {
+  background: var(--panel-raised);
+  filter: none;
+}
+html[data-theme="dark"] .btn-danger {
+  background: #402b2c;
+  border-color: #69403c;
+  color: #ffb5a2;
+}
+html[data-theme="dark"] .workspace-link:hover,
+html[data-theme="dark"] .workspace-link:focus-visible,
+html[data-theme="dark"] .workspace-site:hover,
+html[data-theme="dark"] .workspace-site:focus-visible {
+  background: var(--panel-raised);
+}
+html[data-theme="dark"] .workspace-link.is-current {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
+}
+html[data-theme="dark"] .workspace-avatar {
+  background: #383b54;
+  color: #f0f0f8;
+}
+html[data-theme="dark"] .profile-identity {
+  background: #242641;
+  color: #f7f6fc;
+}
+html[data-theme="dark"] .profile-identity .workspace-avatar-large {
+  background: #ffffff15;
+  color: #fff;
+}
+html[data-theme="dark"] .profile-session button {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"] .workspace-mobile-drawer .ve-modal {
+  background: var(--panel-soft);
+}
+html[data-theme="dark"] .workspace-mobile-drawer .ve-modal h2 {
+  color: var(--panel-secondary);
+}
+html[data-theme="dark"]
+  :is(
+    .ops-page,
+    .dashboard,
+    .workspace-welcome h1,
+    .ops-card h2,
+    .ops-card h3,
+    .ops-lead-card h3,
+    .ops-material-table,
+    .team-card h2,
+    .editor-intro h1,
+    .editor-card h3,
+    .rich-document,
+    .editor-header,
+    .editor-toolbar,
+    .image-manager,
+    .image-meta,
+    .block-menu
+  ) {
+  color: var(--panel-ink);
+}
+html[data-theme="dark"]
+  :is(
+    .workspace-metrics > a,
+    .workspace-section,
+    .team-card,
+    .ops-card,
+    .ops-summary > div,
+    .ops-lead-card,
+    .ops-table-wrap,
+    .editor-card,
+    .editor-header,
+    .rich-document,
+    .editor-toolbar,
+    .stat-card,
+    .admin-project-copy,
+    .projects-empty,
+    .ve-modal,
+    .ve-modal > header,
+    .ve-modal-actions,
+    .block-menu,
+    .insert-options,
+    .login-panel,
+    .login-card,
+    .auth-google,
+    .preview-toolbar,
+    .editor-intro,
+    .image-meta,
+    .profile-area-list button
+  ) {
+  background: var(--panel-surface);
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"]
+  :is(
+    .ops-column,
+    .ops-kanban,
+    .ops-summary,
+    .ops-column > header,
+    .ops-column-empty,
+    .ops-empty,
+    .ops-empty-small,
+    .workspace-empty,
+    .search-input,
+    .project-tabs,
+    .editor-sidebar,
+    .image-manager,
+    .image-upload,
+    .dropzone,
+    .auth-page,
+    .auth-divider:before,
+    .auth-divider:after,
+    .preview-toolbar,
+    .profile-area-list button
+  ) {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"]
+  :is(
+    .workspace-metrics > a:hover,
+    .workspace-metrics > a:focus-visible,
+    .profile-area-list button:hover,
+    .profile-area-list button:focus-visible,
+    .ops-icon-button:hover,
+    .ops-icon-button:focus-visible,
+    .role-picker > button:hover,
+    .role-picker > button:focus-visible,
+    .project-tabs button[aria-pressed="true"],
+    .editor-toolbar button:hover,
+    .editor-toolbar button.is-active,
+    .auth-google:hover,
+    .auth-google:focus-visible
+  ) {
+  background: var(--panel-raised);
+  color: var(--panel-ink);
+}
+html[data-theme="dark"]
+  :is(
+    .workspace-welcome p,
+    .workspace-metrics p,
+    .workspace-metrics > a > div > span,
+    .workspace-section > p,
+    .workspace-row small,
+    .workspace-section-head > a,
+    .workspace-empty p,
+    .ops-heading > div > p,
+    .ops-heading > div > span,
+    .ops-detail-heading > div > p,
+    .ops-card-heading > span,
+    .ops-card p,
+    .ops-lead-card > p,
+    .ops-lead-card .ops-card-idea,
+    .ops-card-contact,
+    .ops-column-empty,
+    .ops-board-bottom,
+    .ops-card footer,
+    .ops-summary span,
+    .ops-material-table th,
+    .ops-material-table td small,
+    .ops-ledger p,
+    .ops-ledger small,
+    .team-card > p,
+    .team-card-meta,
+    .team-role,
+    .role-picker small,
+    .role-sections,
+    .ve-modal > header p,
+    .hint,
+    .field > label,
+    .dashboard-heading > div > p:last-child,
+    .stat-card span,
+    .studio-footer,
+    .editor-intro > p,
+    .save-state,
+    .login-card > p,
+    .auth-divider,
+    .auth-assurance,
+    .rich-document p.is-editor-empty:first-child::before
+  ) {
+  color: var(--panel-secondary);
+}
+html[data-theme="dark"]
+  :is(
+    .workspace-section-head,
+    .workspace-row,
+    .workspace-pipeline > div:last-child > a,
+    .ops-material-table td,
+    .ops-material-table th,
+    .ops-ledger > div,
+    .ops-lead-card > footer,
+    .ops-column > header,
+    .ops-summary,
+    .ops-card-heading,
+    .team-card,
+    .ve-modal header,
+    .ve-modal footer,
+    .editor-toolbar,
+    .image-meta,
+    .editor-header
+  ) {
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"] .workspace-metrics strong,
+html[data-theme="dark"] .ops-summary strong,
+html[data-theme="dark"] .workspace-pipeline strong {
+  color: var(--panel-ink);
+}
+html[data-theme="dark"] .workspace-metrics > a:nth-child(3) {
+  background: #25312f;
+}
+html[data-theme="dark"] .workspace-stage-bar {
+  background: var(--panel-raised);
+}
+html[data-theme="dark"] .role-picker > button {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+  color: var(--panel-ink);
+}
+html[data-theme="dark"] .role-picker > button.selected {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
+  border-color: #85513f;
+}
+html[data-theme="dark"] .notice {
+  background: #26382f;
+  border-color: #3c5d48;
+  color: #d0e9d5;
+}
+html[data-theme="dark"] .notice-error {
+  background: #422c2b;
+  border-color: #70483d;
+  color: #ffbfaa;
+}
+html[data-theme="dark"]
+  :is(.team-state, .ops-ticket, .ops-stock-status, .status, .ops-move-kind) {
+  background: #2b3a32;
+  color: #cee4d4;
+}
+html[data-theme="dark"]
+  :is(
+    .state-pending,
+    .ticket-high,
+    .ticket-large,
+    .ops-stock-status.low,
+    .status:not(.status-live)
+  ) {
+  background: #42352a;
+  color: #f5d8af;
+}
+html[data-theme="dark"] .auth-links button,
+html[data-theme="dark"] .auth-resend {
+  color: var(--panel-accent);
+}
+html[data-theme="dark"] .login-story {
+  color: #fff;
+}
+html[data-theme="dark"] .veca-select {
+  --select-text: var(--panel-ink);
+  --select-muted: var(--panel-secondary);
+  --select-surface: var(--panel-surface);
+  --select-soft: var(--panel-raised);
+  --select-edge: var(--panel-edge);
+  --select-accent: var(--panel-accent);
+}
+html[data-theme="dark"] .ve-modal-backdrop {
+  background: #070a14b0;
+}
+html[data-theme="dark"] .profile-photo-upload {
+  color: #fff;
+}
+@media (max-width: 380px) {
+  .theme-options {
+    gap: 6px;
+  }
+  .theme-options > button {
+    padding: 6px 6px 10px;
+  }
+  .theme-options > button > span:last-child {
+    gap: 4px;
+    font-size: 10px;
+  }
+  .theme-swatch {
+    min-height: 52px;
+  }
+}
+html[data-theme="dark"] .editor-intro {
+  background: transparent;
+}
+html[data-theme="dark"] .tag-picker button {
+  background: var(--panel-soft);
+  color: var(--panel-secondary);
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"] .tag-picker button[aria-pressed="true"] {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
+  border-color: #85513f;
+}
+html[data-theme="dark"]
+  :is(
+    .editor-tip,
+    .ops-stage-track li > span,
+    .image-library,
+    .image-library-item,
+    .ops-files > a
+  ) {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+  color: var(--panel-secondary);
+}
+html[data-theme="dark"]
+  :is(
+    .checkbox-field small,
+    .editor-description,
+    .ops-stage-label,
+    .ops-detail-heading > div > span,
+    .ops-contact-links a,
+    .ops-back,
+    .ops-detail-tabs > button,
+    .ops-column > header > span
+  ) {
+  color: var(--panel-secondary);
+}
+html[data-theme="dark"] .ops-detail-tabs > button[aria-pressed="true"] {
+  color: var(--panel-accent);
+}
+html[data-theme="dark"] :is(.ops-detail-tabs, .ops-stage-track li) {
+  border-color: var(--panel-edge);
+}
+html[data-theme="dark"] .ops-success {
+  background: #26382f;
+  color: #d0e9d5;
+}
+html[data-theme="dark"] .seo-title {
+  color: #a7c2ff;
+}
+html[data-theme="dark"] .seo-url {
+  color: #bdd4bc;
+}
+html[data-theme="dark"]
+  :is(
+    .seo-description,
+    .external-link,
+    .upload-empty strong,
+    .upload-empty span
+  ) {
+  color: var(--panel-secondary);
+}
+html[data-theme="dark"] .upload-empty {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+  color: var(--panel-secondary);
+}

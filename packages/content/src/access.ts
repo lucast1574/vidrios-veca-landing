@@ -37,6 +37,9 @@ export type SessionUser = {
   roleName: string | null;
   status: AccountStatus;
   emailVerified: boolean;
+  avatarUrl: string | null;
+  avatarSource: "google" | "upload" | "none";
+  googlePhotoAvailable: boolean;
   authMethods: ("google" | "password")[];
   accountCreatedAt: string | null;
   permissions: Permission[];

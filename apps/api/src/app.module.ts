@@ -3,6 +3,7 @@ import type { Response } from "express";
 import { DatabaseModule, Database } from "./database/database.module";
 import { AccessModule } from "./access/access.controller";
 import { MailModule } from "./mail/mail.service";
+import { ProfileModule } from "./profile/profile.module";
 import { AuthModule } from "./auth/auth.module";
 import { ProjectsModule } from "./projects/projects.module";
 import { MediaModule } from "./media/media.module";
@@ -41,6 +42,7 @@ class HealthController {
     DatabaseModule,
     MailModule,
     AuthModule,
+    ProfileModule,
     AccessModule,
     ProjectsModule,
     MediaModule,

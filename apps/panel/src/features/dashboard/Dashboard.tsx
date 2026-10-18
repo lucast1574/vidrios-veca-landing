@@ -203,7 +203,7 @@ export function Dashboard({ user }: { user: SessionUser }) {
                 <CalendarDays size={25} />
                 <p>Aún no hay coordinaciones próximas.</p>
                 <a href="#leads">
-                  Revisar oportunidades <ArrowRight size={15} />
+                  Revisar leads <ArrowRight size={15} />
                 </a>
               </div>
             )}
@@ -243,7 +243,7 @@ export function Dashboard({ user }: { user: SessionUser }) {
         {can("leads") && (
           <section className="workspace-section">
             <div className="workspace-section-head">
-              <h2>Últimas oportunidades</h2>
+              <h2>Últimas leads</h2>
               <Kanban size={19} />
             </div>
             {data?.recent.length ? (

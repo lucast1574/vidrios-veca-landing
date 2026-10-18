@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import type { SessionUser } from "@veca/content";
 import { Button, Notice } from "../../components/ui";
-import { UserAvatar } from "../../components/workspace/UserAvatar";
+import { PhotoSettings } from "./PhotoSettings";
+import { AppearanceSettings } from "./AppearanceSettings";
 import {
   WORKSPACE_ITEMS,
   type WorkspaceView,
@@ -40,8 +41,10 @@ export function UserProfile({
   user,
   onLogout,
   onNavigate,
+  onUpdate,
 }: {
   user: SessionUser;
+  onUpdate: (user: SessionUser) => void;
   onLogout: () => Promise<void>;
   onNavigate: (view: WorkspaceView) => unknown;
 }) {
@@ -70,7 +73,7 @@ export function UserProfile({
       </header>
       <div className="profile-layout">
         <section className="profile-identity" aria-labelledby="profile-name">
-          <UserAvatar name={user.name} large />
+          <PhotoSettings user={user} onUpdate={onUpdate} />
           <h2 id="profile-name">{user.name}</h2>
           <p className="profile-email">{user.email || user.username}</p>
           <span className={`profile-account-state state-${user.status}`}>
@@ -167,6 +170,7 @@ export function UserProfile({
               </div>
             )}
           </section>
+          <AppearanceSettings />
           <section
             className="profile-session"
             aria-labelledby="profile-session-heading"

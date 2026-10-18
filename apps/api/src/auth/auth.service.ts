@@ -13,6 +13,7 @@ import { ObjectId } from "mongodb";
 import { initializeApp, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { type RoleDefinition, type SessionUser } from "@veca/content";
+import { googlePhotoUrl } from "../profile/google-photo";
 import { RolesService } from "./roles.service";
 import { Database } from "../database/database.module";
 import { config } from "../common/config";
@@ -55,6 +56,15 @@ export class AuthService {
       roleName: role?.name || null,
       status,
       emailVerified,
+      avatarUrl:
+        user.avatarSource === "none"
+          ? null
+          : user.avatarSource === "upload" && user.avatarKey
+            ? `${config.PUBLIC_API_URL}/account/avatar/${user._id}?v=${user.avatarVersion || "1"}`
+            : googlePhotoUrl(user.googlePhotoUrl),
+      avatarSource:
+        user.avatarSource || (user.googlePhotoUrl ? "google" : "none"),
+      googlePhotoAvailable: !!googlePhotoUrl(user.googlePhotoUrl),
       authMethods: [
         ...(user.firebaseUid ? ["google" as const] : []),
         ...(user.passwordHash ? ["password" as const] : []),
@@ -216,7 +226,7 @@ export class AuthService {
   async confirm(token: string, code: string) {
     return this.verified(await this.codes.consume(token, code, "verify"));
   }
-  async google(idToken: string) {
+  private async googleIdentity(idToken: string) {
     if (!config.FIREBASE_PROJECT_ID || !config.FIREBASE_API_KEY)
       throw new ServiceUnavailableException(
         "El acceso con Google aún no está configurado.",
@@ -239,6 +249,31 @@ export class AuthService {
         "No pudimos comprobar tu identidad con Google. Intenta nuevamente.",
       );
     }
+    return identity;
+  }
+  async synchronizeGooglePhoto(userId: string, idToken: string) {
+    const identity = await this.googleIdentity(idToken);
+    const user = await this.users.findOne({ _id: new ObjectId(userId) });
+    if (
+      !user?.firebaseUid ||
+      user.firebaseUid !== identity.uid ||
+      user.email?.toLowerCase() !== identity.email!.toLowerCase()
+    )
+      throw new ForbiddenException(
+        "Selecciona la misma cuenta Google de tu perfil.",
+      );
+    const photo = googlePhotoUrl(identity.picture);
+    if (!photo)
+      throw new BadRequestException(
+        "Esta cuenta de Google no tiene una foto disponible.",
+      );
+    await this.users.updateOne(
+      { _id: user._id },
+      { $set: { googlePhotoUrl: photo, updatedAt: new Date() } },
+    );
+  }
+  async google(idToken: string) {
+    const identity = await this.googleIdentity(idToken);
     const email = identity.email!.toLowerCase();
     let user = await this.users.findOne({ username: email });
     if (!user) {
@@ -269,6 +304,7 @@ export class AuthService {
       );
     return this.verified(user._id, {
       firebaseUid: identity.uid,
+      googlePhotoUrl: googlePhotoUrl(identity.picture),
       ...(!user.emailVerified && !user.trustedInvitation
         ? { passwordHash: null }
         : {}),

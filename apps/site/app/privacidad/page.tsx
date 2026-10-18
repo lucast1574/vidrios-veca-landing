@@ -62,7 +62,11 @@ export default function Privacy() {
           está verificado. El servicio de autenticación también puede recibir la
           URL de tu foto de perfil. La aplicación guarda el identificador,
           nombre y correo necesarios para reconocer tu cuenta; no publica tu
-          identidad en la web por iniciar sesión.
+          identidad en la web por iniciar sesión. Si utilizas tu foto de Google,
+          guardamos su URL para mostrarla en el panel. Puedes sustituirla por
+          una foto propia o quitarla desde tu perfil. Las fotos propias se
+          guardan en el almacenamiento de Nexode; su consulta requiere una
+          sesión y se limita a tu cuenta o a administradores del equipo.
         </p>
         <p>
           Estos datos se utilizan para comprobar quién entra, vincular los

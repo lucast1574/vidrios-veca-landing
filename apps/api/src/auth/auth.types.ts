@@ -11,6 +11,10 @@ export interface UserDocument {
   emailVerified?: boolean;
   status?: AccountStatus;
   firebaseUid?: string;
+  googlePhotoUrl?: string | null;
+  avatarSource?: "google" | "upload" | "none";
+  avatarKey?: string;
+  avatarVersion?: string;
   provider?: "google" | "password";
   revision?: number;
   setupHash?: string;

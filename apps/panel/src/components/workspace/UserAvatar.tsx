@@ -1,10 +1,14 @@
+import { useState } from "react";
 export function UserAvatar({
   name,
+  src,
   large = false,
 }: {
   name: string;
+  src?: string | null;
   large?: boolean;
 }) {
+  const [failed, setFailed] = useState<string | null>(null);
   const initials =
     name
       .trim()
@@ -19,7 +23,16 @@ export function UserAvatar({
       className={`workspace-avatar${large ? " workspace-avatar-large" : ""}`}
       aria-hidden="true"
     >
-      {initials}
+      {src && failed !== src ? (
+        <img
+          src={src}
+          alt=""
+          referrerPolicy="no-referrer"
+          onError={() => setFailed(src)}
+        />
+      ) : (
+        initials
+      )}
     </span>
   );
 }

@@ -12,6 +12,7 @@ import {
   type UserSummary,
   type Role,
 } from "@veca/content";
+import { UserAvatar } from "../../components/workspace/UserAvatar";
 import { Select } from "@veca/ui/src/Select";
 import { api } from "../../lib/api";
 import { Button, Notice } from "../../components/ui";
@@ -149,9 +150,7 @@ export function Team({ currentId }: { currentId: string }) {
         {filtered.map((user) => (
           <article className="team-card" key={user.id}>
             <div className="team-card-top">
-              <span className="team-avatar">
-                {user.name.slice(0, 2).toUpperCase()}
-              </span>
+              <UserAvatar name={user.name} src={user.avatarUrl} />
               <span className={`team-state state-${user.status}`}>
                 {statuses[user.status]}
               </span>
@@ -261,7 +260,7 @@ export function Team({ currentId }: { currentId: string }) {
                   ({
                     dashboard: "Resumen",
                     projects: "Proyectos",
-                    leads: "Oportunidades",
+                    leads: "Leads",
                     inventory: "Inventario",
                     users: "Equipo",
                   })[p],

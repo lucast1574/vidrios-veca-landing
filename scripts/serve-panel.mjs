@@ -15,6 +15,7 @@ app.use(
         imgSrc: [
           "'self'",
           process.env.PUBLIC_API_URL || "http://localhost:4000",
+          "https://*.googleusercontent.com",
           "data:",
           "blob:",
         ],

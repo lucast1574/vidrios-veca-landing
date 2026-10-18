@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { googleIdToken } from "../../lib/google";
 import type { AuthSession } from "@veca/content";
 import {
   ArrowUpRight,
@@ -100,34 +101,8 @@ export function AuthScreen({ onLogin }: { onLogin: (s: AuthSession) => void }) {
     setBusy(true);
     setError("");
     try {
-      const [
-        { initializeApp, getApps },
-        {
-          getAuth,
-          GoogleAuthProvider,
-          signInWithPopup,
-          inMemoryPersistence,
-          setPersistence,
-          signOut,
-        },
-      ] = await Promise.all([
-        import("@firebase/app"),
-        import("@firebase/auth"),
-      ]);
-      const app =
-          getApps().find((a) => a.name === "veca-panel") ||
-          initializeApp(settings.google, "veca-panel"),
-        auth = getAuth(app);
-      await setPersistence(auth, inMemoryPersistence);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
-      const result = await signInWithPopup(auth, provider);
-      const token = await result.user.getIdToken();
-      try {
-        receive(await post("/auth/google", { idToken: token }));
-      } finally {
-        await signOut(auth);
-      }
+      const token = await googleIdToken(settings.google);
+      receive(await post("/auth/google", { idToken: token }));
     } catch (e) {
       setError(
         (e as { code?: string }).code?.startsWith("auth/")

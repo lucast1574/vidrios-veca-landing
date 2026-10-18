@@ -205,7 +205,7 @@ export function WorkspaceShell({
             aria-label="Mi perfil"
             aria-current={view === "profile" ? "page" : undefined}
           >
-            <UserAvatar name={user.name} />
+            <UserAvatar name={user.name} src={user.avatarUrl} />
             <span className="workspace-profile-copy">
               <strong>{user.name}</strong>
               <small>

@@ -44,6 +44,19 @@ async function main() {
     }),
   );
   app.use(
+    "/account",
+    rateLimit({
+      windowMs: 60 * 1000,
+      limit: 30,
+      skip: (req) => req.method === "GET",
+      standardHeaders: "draft-8",
+      legacyHeaders: false,
+      message: {
+        message: "Espera un momento antes de cambiar otra vez tu foto.",
+      },
+    }),
+  );
+  app.use(
     "/admin",
     rateLimit({
       windowMs: 60 * 1000,

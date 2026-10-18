@@ -6,7 +6,7 @@
   --glass-secondary: var(--panel-secondary);
   --glass-muted: var(--panel-muted);
   --glass-edge: var(--panel-edge);
-  --veca-orange: #e74927;
+  --veca-orange: var(--panel-brand);
   --veca-orange-wash: var(--panel-accent-soft);
   display: flex;
   min-height: 100dvh;

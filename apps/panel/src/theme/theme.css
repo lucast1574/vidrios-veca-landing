@@ -545,41 +545,60 @@ html[data-theme="dark"] .upload-empty {
 }
 
 /* VECA orange anchors the same actions and hierarchy in both themes. */
-.workspace-dashboard .workspace-welcome > div > p:first-child,
-.workspace-dashboard .workspace-metrics > a > div > svg,
-.workspace-dashboard .workspace-section-head > svg,
-.workspace-dashboard .workspace-empty > svg,
-.workspace-dashboard .workspace-row > svg {
+:root[data-theme] .workspace-dashboard .workspace-welcome > div > p:first-child,
+:root[data-theme] .workspace-dashboard .workspace-metrics > a > div > svg,
+:root[data-theme] .workspace-dashboard .workspace-section-head > svg,
+:root[data-theme] .workspace-dashboard .workspace-empty > svg,
+:root[data-theme] .workspace-dashboard .workspace-row > svg {
   color: var(--panel-accent);
 }
-.workspace-dashboard .workspace-metrics > a.workspace-metric-brand {
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-metrics
+  > a.workspace-metric-brand {
   background: var(--panel-brand-surface);
   border-color: var(--panel-brand-edge);
 }
-.workspace-dashboard .workspace-metrics > a.workspace-metric-brand strong {
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-metrics
+  > a.workspace-metric-brand
+  strong {
   color: var(--panel-accent);
 }
-.workspace-dashboard .workspace-metrics > a:is(:hover, :focus-visible) {
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-metrics
+  > a:is(:hover, :focus-visible) {
   background: var(--panel-brand-surface);
   border-color: var(--panel-brand-edge);
 }
-.workspace-dashboard .workspace-pipeline {
+:root[data-theme] .workspace-dashboard .workspace-pipeline {
   border-top: 3px solid var(--panel-brand);
 }
-.workspace-dashboard .workspace-section-head > a,
-.workspace-dashboard .workspace-empty a {
+:root[data-theme] .workspace-dashboard .workspace-section-head > a,
+:root[data-theme] .workspace-dashboard .workspace-empty a {
   color: var(--panel-accent);
 }
-.workspace-dashboard .workspace-section-head > a:is(:hover, :focus-visible),
-.workspace-dashboard .workspace-empty a:is(:hover, :focus-visible) {
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-section-head
+  > a:is(:hover, :focus-visible),
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-empty
+  a:is(:hover, :focus-visible) {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-.workspace-dashboard
+:root[data-theme]
+  .workspace-dashboard
   .workspace-pipeline
   > div:last-child
   > a:is(:hover, :focus-visible),
-.workspace-dashboard .workspace-row:is(:hover, :focus-visible) {
+:root[data-theme]
+  .workspace-dashboard
+  .workspace-row:is(:hover, :focus-visible) {
   background: var(--panel-accent-soft);
   color: var(--panel-accent);
 }

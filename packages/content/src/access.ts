@@ -37,6 +37,8 @@ export type SessionUser = {
   roleName: string | null;
   status: AccountStatus;
   emailVerified: boolean;
+  authMethods: ("google" | "password")[];
+  accountCreatedAt: string | null;
   permissions: Permission[];
 };
 export type UserSummary = SessionUser & {

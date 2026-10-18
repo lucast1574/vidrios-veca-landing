@@ -48,6 +48,11 @@ const admin = expect(
   }),
   201,
 );
+const ownProfile = expect(await req("/auth/me", "GET", null, admin), 200).body
+  .user;
+assert.deepEqual(ownProfile.authMethods, ["password"]);
+assert.equal(ownProfile.roleName, "Administrador");
+assert.ok(!JSON.stringify(ownProfile).includes("passwordHash"));
 expect(await req("/admin/users", "GET"), 401);
 expect(
   await req("/auth/register", "POST", {
@@ -84,6 +89,8 @@ let member = expect(
 );
 assert.equal(member.body.user.status, "pending");
 assert.equal(member.body.user.role, null);
+assert.deepEqual(member.body.user.authMethods, ["password"]);
+assert.ok(!Number.isNaN(Date.parse(member.body.user.accountCreatedAt)));
 assert.deepEqual(member.body.user.permissions, []);
 expect(
   await req("/auth/verify", "POST", {
@@ -331,15 +338,13 @@ await rolesClient.connect();
 try {
   const db = rolesClient.db("veca_qa");
   const roleId = "custom-" + randomUUID().slice(0, 8);
-  await db
-    .collection("roles")
-    .insertOne({
-      id: roleId,
-      name: "Coordinación técnica QA",
-      description: "Rol definido en datos",
-      permissions: ["dashboard", "leads"],
-      revision: 1,
-    });
+  await db.collection("roles").insertOne({
+    id: roleId,
+    name: "Coordinación técnica QA",
+    description: "Rol definido en datos",
+    permissions: ["dashboard", "leads"],
+    revision: 1,
+  });
   let catalog = expect(await req("/admin/users", "GET", null, admin), 200).body;
   assert.ok(catalog.roles.some((r) => r.id === roleId));
   assert.ok(!JSON.stringify(catalog).includes("passwordHash"));
@@ -412,6 +417,8 @@ try {
       .permissions,
     [],
   );
+  expect(await req("/auth/logout", "POST", {}, member), 201);
+  expect(await req("/auth/me", "GET", null, member), 401);
   console.log(
     "Database roles passed: arbitrary new ID, dynamic catalog and name, live permission changes, missing-role denial and database-selected corporate default.",
   );

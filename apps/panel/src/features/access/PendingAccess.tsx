@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Clock3, ShieldCheck, LogOut, RefreshCw } from "lucide-react";
+import { Clock3, ShieldCheck, UserRound, RefreshCw } from "lucide-react";
 import type { AuthSession } from "@veca/content";
-import { api, post, setCsrf } from "../../lib/api";
+import { api } from "../../lib/api";
 import { Button, Notice } from "../../components/ui";
 export function PendingAccess({
   session,
   onUpdate,
-  onLogout,
+  onProfile,
 }: {
   session: AuthSession;
   onUpdate: (s: AuthSession) => void;
-  onLogout: () => void;
+  onProfile: () => void;
 }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -58,16 +58,9 @@ export function PendingAccess({
           <RefreshCw size={15} />
           {busy ? "Revisando…" : "Comprobar acceso"}
         </Button>
-        <button
-          className="access-logout"
-          onClick={async () => {
-            await post("/auth/logout", {});
-            setCsrf("");
-            onLogout();
-          }}
-        >
-          <LogOut size={15} />
-          Cerrar sesión
+        <button className="access-logout" onClick={onProfile}>
+          <UserRound size={15} />
+          Ver mi perfil
         </button>
       </section>
     </main>

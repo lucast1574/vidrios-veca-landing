@@ -575,13 +575,6 @@
   line-height: 1.9;
   margin: 15px 0;
 }
-.studio-nav .nav-bottom strong {
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-}
 @media (max-width: 1150px) {
   .team-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

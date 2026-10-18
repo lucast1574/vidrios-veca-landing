@@ -55,6 +55,11 @@ export class AuthService {
       roleName: role?.name || null,
       status,
       emailVerified,
+      authMethods: [
+        ...(user.firebaseUid ? ["google" as const] : []),
+        ...(user.passwordHash ? ["password" as const] : []),
+      ],
+      accountCreatedAt: user.createdAt?.toISOString() || null,
       permissions:
         status === "active" && emailVerified
           ? [...(role?.permissions || [])]

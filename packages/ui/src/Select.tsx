@@ -102,8 +102,9 @@ export function Select({
                       options.length,
             );
             setOpen(true);
-          } else if (e.key === "Escape") {
+          } else if (e.key === "Escape" && open) {
             e.preventDefault();
+            e.stopPropagation();
             setOpen(false);
           } else if (e.key === "Tab") setOpen(false);
           else if (e.key === "Enter" || e.key === " ") {

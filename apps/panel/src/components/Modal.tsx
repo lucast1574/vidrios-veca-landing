@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 export function Modal({
   title,
@@ -7,6 +8,8 @@ export function Modal({
   footer,
   onClose,
   busy = false,
+  size = "default",
+  className,
 }: {
   title: string;
   description?: string;
@@ -14,12 +17,19 @@ export function Modal({
   footer?: ReactNode;
   onClose: () => void;
   busy?: boolean;
+  size?: "default" | "wide";
+  className?: string;
 }) {
   const id = useId(),
     dialog = useRef<HTMLDivElement>(null);
+  const latest = useRef({ busy, onClose });
+  latest.current = { busy, onClose };
   useEffect(() => {
+    const background = document.getElementById("root");
+    const wasInert = background?.inert || false;
     const previous = document.activeElement as HTMLElement | null;
     const old = document.body.style.overflow;
+    if (background) background.inert = true;
     document.body.style.overflow = "hidden";
     const focusables = () =>
       [
@@ -29,9 +39,13 @@ export function Modal({
       ].filter((el) => el.getClientRects().length);
     (focusables()[0] || dialog.current)?.focus();
     const keys = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !busy) {
+      if (
+        event.key === "Escape" &&
+        !latest.current.busy &&
+        !event.defaultPrevented
+      ) {
         event.preventDefault();
-        onClose();
+        latest.current.onClose();
       }
       if (event.key === "Tab") {
         const items = focusables(),
@@ -50,10 +64,11 @@ export function Modal({
     return () => {
       document.removeEventListener("keydown", keys);
       document.body.style.overflow = old;
+      if (background) background.inert = wasInert;
       previous?.focus();
     };
-  }, [busy, onClose]);
-  return (
+  }, []);
+  const content = (
     <div
       className="ve-modal-backdrop"
       onPointerDown={(event) => {
@@ -61,7 +76,7 @@ export function Modal({
       }}
     >
       <div
-        className="ve-modal"
+        className={`ve-modal${size === "wide" ? " ve-modal-wide" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={id}
@@ -88,5 +103,9 @@ export function Modal({
         {footer}
       </div>
     </div>
+  );
+  return createPortal(
+    className ? <div className={className}>{content}</div> : content,
+    document.body,
   );
 }

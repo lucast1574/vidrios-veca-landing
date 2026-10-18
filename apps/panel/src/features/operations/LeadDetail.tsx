@@ -10,6 +10,7 @@ import {
   LEAD_SEGMENTS,
   REQUEST_TYPES,
   type LeadInput,
+  type PhotoMetadata,
   type Lead,
   type Material,
 } from "@veca/content";
@@ -37,6 +38,8 @@ import {
   useMessage,
   useLiveRefresh,
 } from "./shared";
+import { PhotoMetadataFields } from "../gallery/PhotoMetadataFields";
+import "../gallery/gallery.css";
 import { MaterialMovement } from "./Inventory";
 const contracts = [
   { value: "pending", label: "Por definir" },
@@ -71,7 +74,11 @@ export function LeadDetail({
     [materials, setMaterials] = useState<Material[]>([]),
     [movement, setMovement] = useState(false),
     [note, setNote] = useState(""),
-    [caption, setCaption] = useState("");
+    [photoMetadata, setPhotoMetadata] = useState<PhotoMetadata>({
+      caption: "",
+      tags: [],
+      sharing: "internal",
+    });
   const { error, setError, fail } = useMessage();
   const upload = useRef<HTMLInputElement>(null);
   const refresh = useCallback(async () => {
@@ -200,13 +207,15 @@ export function LeadDetail({
     try {
       const form = new FormData();
       form.append("file", file);
-      form.append("caption", caption);
+      form.append("caption", photoMetadata.caption);
+      form.append("tags", JSON.stringify(photoMetadata.tags));
+      form.append("sharing", photoMetadata.sharing);
       await api(`/admin/crm/leads/${id}/files`, { method: "POST", body: form });
       const attachments = await api<LeadDetailData>(`/admin/crm/leads/${id}`);
       setData((old) =>
         old ? { ...old, attachments: attachments.attachments } : old,
       );
-      setCaption("");
+      setPhotoMetadata({ caption: "", tags: [], sharing: "internal" });
       setNotice("Archivo añadido a la ficha.");
     } catch (e) {
       fail(e);
@@ -482,14 +491,16 @@ export function LeadDetail({
               {busy ? "Subiendo…" : "Añadir archivo"}
             </Button>
           </div>
-          <Field label="Descripción del próximo archivo">
-            <input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              maxLength={500}
-              placeholder="Ej. Estado inicial de la fachada / contrato firmado"
+          <fieldset className="gallery-edit-fields" disabled={busy}>
+            <PhotoMetadataFields
+              value={photoMetadata}
+              onChange={setPhotoMetadata}
             />
-          </Field>
+            <p className="hint">
+              Las fotos aparecerán en la Galería. En contratos PDF solo se
+              guarda la descripción.
+            </p>
+          </fieldset>
           <input
             ref={upload}
             className="ops-file-input"
@@ -518,6 +529,14 @@ export function LeadDetail({
                 )}
                 <strong>{a.caption || a.name}</strong>
                 <small>{date(a.createdAt)}</small>
+                {a.type === "photo" && (
+                  <small>
+                    {a.sharing === "clients"
+                      ? "Autorizada para mostrar a clientes"
+                      : "Solo uso interno"}
+                    {a.tags.length ? " · " + a.tags.join(" · ") : ""}
+                  </small>
+                )}
               </a>
             ))}
           </div>

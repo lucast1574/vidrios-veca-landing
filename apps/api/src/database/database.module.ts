@@ -47,6 +47,9 @@ export class Database implements OnModuleInit, OnModuleDestroy {
         .collection("inventory_movements")
         .createIndex({ materialId: 1, at: -1 }),
       this.db.collection("crm_files").createIndex({ leadId: 1, createdAt: -1 }),
+      this.db
+        .collection("crm_files")
+        .createIndex({ type: 1, createdAt: -1, _id: -1 }),
       this.db.collection("projects").createIndex({ slug: 1 }, { unique: true }),
       this.db
         .collection("projects")

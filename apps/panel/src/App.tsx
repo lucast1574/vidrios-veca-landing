@@ -10,6 +10,7 @@ import { Team } from "./features/access/Team";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { type AuthSession } from "@veca/content";
 
+import { PrivateGallery } from "./features/gallery/PrivateGallery";
 import { Operations } from "./features/operations/Operations";
 
 import { useEffect, useMemo, useState } from "react";
@@ -175,6 +176,8 @@ export default function App() {
         <Dashboard user={session.user} />
       ) : view === "users" ? (
         <Team currentId={session.user.id} />
+      ) : view === "gallery" ? (
+        <PrivateGallery canOpenLead={can("leads")} />
       ) : view !== "projects" ? (
         <Operations view={view} inventoryAccess={can("inventory")} />
       ) : editing !== undefined ? (

@@ -3,6 +3,7 @@ export const PERMISSIONS = [
   "dashboard",
   "projects",
   "leads",
+  "gallery",
   "inventory",
   "users",
 ] as const;

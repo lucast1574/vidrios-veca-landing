@@ -1512,3 +1512,156 @@ html:has(.ve-home) {
   outline: none;
   box-shadow: none;
 }
+
+/* Logo entrance: one short reveal per session, with an immediate way through. */
+.ve-logo-entrance {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  background: #242641;
+  color: #fff;
+  pointer-events: none;
+  animation: ve-entrance-exit 440ms cubic-bezier(0.7, 0, 0.3, 1) 1300ms forwards;
+}
+.ve-entrance-composition {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+.ve-entrance-composition > img {
+  position: relative;
+  width: 184px;
+  height: 120px;
+  object-fit: contain;
+  animation: ve-entrance-logo 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.ve-entrance-composition > p {
+  font-size: 12px;
+  color: #d1d3e0;
+  letter-spacing: 0.025em;
+  animation: ve-entrance-copy 500ms ease 260ms both;
+}
+.ve-entrance-pane {
+  position: absolute;
+  width: 150px;
+  height: 200px;
+  border: 1px solid #ffffff14;
+  transform: skewY(-16deg);
+}
+.ve-entrance-pane-one {
+  left: -110px;
+  top: -60px;
+  animation: ve-entrance-pane-left 950ms ease both;
+}
+.ve-entrance-pane-two {
+  right: -110px;
+  top: 0;
+  animation: ve-entrance-pane-right 950ms ease both;
+}
+.ve-entrance-line {
+  width: 64px;
+  height: 2px;
+  background: #e74927;
+  transform-origin: left;
+  animation: ve-entrance-line 1000ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.ve-logo-entrance > button {
+  pointer-events: auto;
+  position: absolute;
+  bottom: max(32px, env(safe-area-inset-bottom));
+  right: max(24px, 5vw);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ffffff40;
+  color: #e4e5ef;
+  padding: 12px 0;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.ve-logo-entrance > button > span {
+  margin-left: 20px;
+  color: #ff9678;
+}
+.ve-logo-entrance > button:is(:hover, :focus-visible) {
+  color: #ff9678;
+  border-bottom-color: #ff9678;
+  outline: none;
+  box-shadow: none;
+}
+@keyframes ve-entrance-logo {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes ve-entrance-copy {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ve-entrance-pane-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px) skewY(-16deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) skewY(-16deg);
+  }
+}
+@keyframes ve-entrance-pane-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px) skewY(-16deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) skewY(-16deg);
+  }
+}
+@keyframes ve-entrance-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes ve-entrance-exit {
+  to {
+    opacity: 0;
+    transform: translateY(-6%);
+    visibility: hidden;
+  }
+}
+@media (max-width: 600px) {
+  .ve-entrance-pane {
+    width: 95px;
+    height: 160px;
+  }
+  .ve-entrance-pane-one {
+    left: -40px;
+  }
+  .ve-entrance-pane-two {
+    right: -40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ve-logo-entrance {
+    display: none;
+    animation: none;
+  }
+}

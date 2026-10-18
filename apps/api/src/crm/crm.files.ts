@@ -8,8 +8,8 @@ import sharp from "sharp";
 import { Database } from "../database/database.module";
 import { StorageService } from "../media/storage.service";
 import { CrmRepository } from "./crm.repository";
-import type { LeadAttachment } from "@veca/content";
-type AttachmentDocument = Omit<LeadAttachment, "id" | "url"> & {
+import type { LeadAttachment, PhotoMetadata } from "@veca/content";
+export type AttachmentDocument = Omit<LeadAttachment, "id" | "url"> & {
   _id: ObjectId;
   key: string;
   mime: string;
@@ -32,6 +32,9 @@ export class CrmFiles {
       type: d.type,
       caption: d.caption,
       createdAt: d.createdAt,
+      tags: d.tags || [],
+      sharing: d.sharing || "internal",
+      revision: d.revision || 0,
       url: `/admin/crm/files/${d._id}`,
     };
   }
@@ -45,7 +48,11 @@ export class CrmFiles {
         .toArray()
     ).map((d) => this.view(d));
   }
-  async upload(leadId: string, file: Express.Multer.File, caption: string) {
+  async upload(
+    leadId: string,
+    file: Express.Multer.File,
+    metadata: PhotoMetadata,
+  ) {
     await this.leads.get(leadId);
     if (!file)
       throw new BadRequestException("Selecciona una foto o contrato PDF.");
@@ -85,9 +92,12 @@ export class CrmFiles {
         file.originalname.replace(/[^\p{L}\p{N} ._-]/gu, "").slice(0, 150) ||
         "Archivo",
       type: pdf ? "contract" : "photo",
-      caption: String(caption || "")
+      caption: String(metadata.caption || "")
         .trim()
         .slice(0, 500),
+      tags: pdf ? [] : metadata.tags,
+      sharing: pdf ? "internal" : metadata.sharing,
+      revision: 1,
       createdAt: new Date().toISOString(),
       key: `veca/leads/${leadId}/${id}.${pdf ? "pdf" : "webp"}`,
       mime: pdf ? "application/pdf" : "image/webp",

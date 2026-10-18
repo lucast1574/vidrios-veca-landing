@@ -186,7 +186,40 @@ export type Movement = {
   at: string;
   balanceAfter: number;
 };
-export type LeadAttachment = {
+export const PHOTO_TAGS = [
+  "Antes",
+  "Avance",
+  "Resultado",
+  "Detalle",
+  "Instalación",
+  "Materiales",
+] as const;
+export const photoMetadataSchema = z
+  .object({
+    caption: z.string().trim().max(500).default(""),
+    tags: z
+      .array(z.enum(PHOTO_TAGS))
+      .max(6)
+      .refine((v) => new Set(v).size === v.length)
+      .default([]),
+    sharing: z.enum(["internal", "clients"]).default("internal"),
+  })
+  .strict();
+export type PhotoMetadata = z.infer<typeof photoMetadataSchema>;
+export type GalleryPhoto = LeadAttachment & {
+  lead: Pick<
+    Lead,
+    "id" | "name" | "district" | "requestType" | "segment" | "stage"
+  >;
+};
+export type GalleryPage = {
+  items: GalleryPhoto[];
+  total: number;
+  page: number;
+  pages: number;
+};
+export type LeadAttachment = PhotoMetadata & {
+  revision: number;
   id: string;
   leadId: string;
   name: string;

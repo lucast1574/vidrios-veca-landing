@@ -261,6 +261,7 @@ export function Team({ currentId }: { currentId: string }) {
                     dashboard: "Resumen",
                     projects: "Proyectos",
                     leads: "Leads",
+                    gallery: "Galería",
                     inventory: "Inventario",
                     users: "Equipo",
                   })[p],

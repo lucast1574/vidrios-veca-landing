@@ -1,4 +1,11 @@
-import { Gauge, LayoutGrid, Kanban, Package, Users } from "lucide-react";
+import {
+  Gauge,
+  LayoutGrid,
+  Kanban,
+  Package,
+  Users,
+  Images,
+} from "lucide-react";
 import type { Permission } from "@veca/content";
 export type WorkspaceView = Permission | "profile";
 export const WORKSPACE_ITEMS = [
@@ -21,6 +28,13 @@ export const WORKSPACE_ITEMS = [
     label: "Proyectos",
     description: "El trabajo que publicamos",
     Icon: LayoutGrid,
+    group: "Seguimiento",
+  },
+  {
+    id: "gallery",
+    label: "Galería",
+    description: "Fotos privadas de las obras",
+    Icon: Images,
     group: "Seguimiento",
   },
   {

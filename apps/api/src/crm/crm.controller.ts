@@ -19,6 +19,9 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import type { Response } from "express";
 import { Readable } from "node:stream";
 import { z } from "zod";
+import { photoMetadataSchema } from "@veca/content";
+import { GalleryController } from "../gallery/gallery.controller";
+import { GalleryService } from "../gallery/gallery.service";
 import { PublicEndpoint, RequirePermission } from "../auth/route-access";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { AuthModule } from "../auth/auth.module";
@@ -108,15 +111,27 @@ class CrmController {
   @Post("leads/:id/files")
   @UseInterceptors(
     FileInterceptor("file", {
-      limits: { fileSize: 12 * 1024 * 1024, files: 1, fields: 1 },
+      limits: { fileSize: 12 * 1024 * 1024, files: 1, fields: 3 },
     }),
   )
   upload(
     @Param("id") id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Body("caption") caption: string,
+    @Body() body: Record<string, unknown>,
   ) {
-    return this.files.upload(id, file, caption);
+    let tags: unknown = [];
+    if (body.tags !== undefined) {
+      try {
+        tags = JSON.parse(String(body.tags));
+      } catch {
+        throw new BadRequestException("Etiquetas inválidas.");
+      }
+    }
+    return this.files.upload(
+      id,
+      file,
+      parse(photoMetadataSchema, { ...body, tags }),
+    );
   }
   @Get("files/:id") async read(@Param("id") id: string, @Res() res: Response) {
     const { doc, file } = await this.files.read(id);
@@ -162,7 +177,14 @@ class CrmController {
 }
 @Module({
   imports: [AuthModule, MediaModule],
-  controllers: [ConsultationController, CrmController],
-  providers: [CrmRepository, CrmService, CrmFiles, InventoryService, CrmEvents],
+  controllers: [ConsultationController, CrmController, GalleryController],
+  providers: [
+    CrmRepository,
+    CrmService,
+    CrmFiles,
+    InventoryService,
+    CrmEvents,
+    GalleryService,
+  ],
 })
 export class CrmModule {}

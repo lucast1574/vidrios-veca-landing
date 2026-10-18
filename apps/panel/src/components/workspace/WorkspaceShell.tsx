@@ -277,11 +277,13 @@ export function WorkspaceShell({
         </div>
       </div>
       {mobileOpen && (
-        <div className="workspace-mobile-drawer">
-          <Modal title="Tu espacio VECA" onClose={closeMobile}>
-            <div className="workspace-drawer-content">{contents(false)}</div>
-          </Modal>
-        </div>
+        <Modal
+          className="workspace-mobile-drawer"
+          title="Tu espacio VECA"
+          onClose={closeMobile}
+        >
+          <div className="workspace-drawer-content">{contents(false)}</div>
+        </Modal>
       )}
     </div>
   );

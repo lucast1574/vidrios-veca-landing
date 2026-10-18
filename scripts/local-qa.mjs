@@ -89,22 +89,10 @@ const panel = spawn(process.execPath, ["scripts/serve-panel.mjs"], {
   env: { ...env, PORT: "3300" },
   stdio: ["ignore", "ignore", "inherit"],
 });
-const site = spawn(
-  process.execPath,
-  [
-    "node_modules/next/dist/bin/next",
-    "start",
-    "apps/site",
-    "--hostname",
-    "127.0.0.1",
-    "--port",
-    "3380",
-  ],
-  {
-    env: { ...env, API_INTERNAL_URL: "http://127.0.0.1:4400" },
-    stdio: ["ignore", "ignore", "inherit"],
-  },
-);
+const site = spawn(process.execPath, ["scripts/serve-site.mjs"], {
+  env: { ...env, PORT: "3380", API_INTERNAL_URL: "http://127.0.0.1:4400" },
+  stdio: ["ignore", "ignore", "inherit"],
+});
 async function stop() {
   api.kill("SIGTERM");
   panel.kill("SIGTERM");

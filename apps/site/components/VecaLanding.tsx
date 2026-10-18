@@ -284,6 +284,7 @@ export function VecaLanding({
           <a href="#soluciones">Soluciones</a>
           <a href="/proyectos/">Proyectos</a>
           <a href="#contacto">Contacto</a>
+          <a href="/privacidad/">Privacidad</a>
         </nav>
         <div className="ve-footer-bottom">
           <span>© {new Date().getFullYear()} Vidrios VECA</span>

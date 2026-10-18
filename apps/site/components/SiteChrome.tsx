@@ -87,6 +87,7 @@ export function SiteFooter() {
       >
         WhatsApp · +51 908 917 621
       </a>
+      <a href="/privacidad/">Privacidad</a>
       <span>VIDRIOS VECA · LIMA, PERÚ · 2026</span>
     </footer>
   );

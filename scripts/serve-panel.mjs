@@ -28,6 +28,7 @@ app.use(
           "https://*.firebaseapp.com",
         ],
         frameSrc: [
+          "https://veca.com.pe",
           "'self'",
           "https://*.firebaseapp.com",
           "https://accounts.google.com",

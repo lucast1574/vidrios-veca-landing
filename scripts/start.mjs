@@ -3,15 +3,7 @@ const role = process.env.APP_ROLE || "site";
 const commands = {
   api: ["apps/api/dist/main.js"],
   panel: ["scripts/serve-panel.mjs"],
-  site: [
-    "node_modules/next/dist/bin/next",
-    "start",
-    "apps/site",
-    "--hostname",
-    "0.0.0.0",
-    "--port",
-    process.env.PORT || "80",
-  ],
+  site: ["scripts/serve-site.mjs"],
 };
 if (!commands[role]) throw new Error("APP_ROLE must be api, panel or site");
 const child = spawn(process.execPath, commands[role], {

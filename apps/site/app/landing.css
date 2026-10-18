@@ -1,3 +1,6 @@
+html:has(.ve-home) {
+  scroll-padding-top: 24px;
+}
 .ve-home {
   --ve-night: #242641;
   --ve-blue: #353950;

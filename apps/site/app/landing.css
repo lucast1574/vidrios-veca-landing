@@ -170,42 +170,6 @@ html:has(.ve-home) {
   color: #edf1f4;
   line-height: 1.8;
 }
-.ve-hero-controls {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 20px;
-  padding: 20px 5vw;
-  border-top: 1px solid #ffffff30;
-  font-size: 11px;
-  background: #24264145;
-  backdrop-filter: blur(8px);
-}
-.ve-hero-controls > div {
-  display: flex;
-  gap: 5px;
-}
-.ve-hero-controls button {
-  background: transparent;
-  color: #fff;
-  border: 1px solid #ffffff50;
-  padding: 10px 18px;
-  font-size: 11px;
-  min-height: 42px;
-  transition: background 0.25s;
-}
-.ve-hero-controls button[aria-pressed="true"] {
-  background: white;
-  color: var(--ve-night);
-  border-color: white;
-}
-.ve-hero-controls > a {
-  margin-left: auto;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-}
 .ve-glass-pane {
   position: absolute;
   right: 5vw;
@@ -851,16 +815,6 @@ html:has(.ve-home) {
   }
   .ve-glass-pane svg {
     display: none;
-  }
-  .ve-hero-controls {
-    padding: 14px 24px;
-    gap: 12px;
-  }
-  .ve-hero-controls > span {
-    display: none;
-  }
-  .ve-hero-controls button {
-    padding: 9px 15px;
   }
   .ve-hero-image img {
     object-position: 60% center;
@@ -1595,25 +1549,7 @@ html:has(.ve-home) {
   }
 }
 
-@media (min-width: 761px) and (max-width: 1100px) {
-  .ve-hero-controls > span {
-    display: none;
-  }
-}
 @media (max-width: 760px) {
-  .ve-hero-controls {
-    position: absolute;
-    top: 105px;
-    left: 24px;
-    right: auto;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    backdrop-filter: none;
-  }
-  .ve-hero-controls > a {
-    display: none;
-  }
   .ve-glass-pane {
     display: none;
   }

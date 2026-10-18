@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { WHATSAPP, questions } from "./landing/content";
 import { Arrow, Action } from "./landing/Controls";
 import { SolutionExplorer } from "./landing/SolutionExplorer";
@@ -12,7 +12,6 @@ export function VecaLanding({
   featured: ReactNode;
   consultationUrl: string;
 }) {
-  const [view, setView] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const node = root.current;
@@ -58,13 +57,8 @@ export function VecaLanding({
           </a>
           <div className="ve-hero-image">
             <img
-              key={view}
-              src={`/assets/${view === 0 ? "facade.webp" : "vivienda.webp"}`}
-              alt={
-                view === 0
-                  ? "Perspectiva de una fachada acristalada hacia el cielo"
-                  : "Vivienda abierta a la luz natural con ventanas amplias"
-              }
+              src="/assets/facade.webp"
+              alt="Perspectiva de una fachada acristalada hacia el cielo"
               width="1600"
               height="1067"
               fetchPriority="high"
@@ -103,34 +97,6 @@ export function VecaLanding({
                 strokeWidth=".7"
               />
             </svg>
-          </div>
-          <div
-            className="ve-hero-controls"
-            aria-label="Cambiar vista de inspiración"
-          >
-            <span>Una nueva forma de mirar</span>
-            <div>
-              {["Arquitectura", "Hogar"].map((name, i) => (
-                <button
-                  key={name}
-                  aria-pressed={view === i}
-                  onClick={() => setView(i)}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-            <a href="#soluciones" aria-label="Bajar a soluciones">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                aria-hidden="true"
-              >
-                <path d="M12 3v18m-7-7 7 7 7-7" />
-              </svg>
-            </a>
           </div>
         </section>
         <div className="ve-intro-band">

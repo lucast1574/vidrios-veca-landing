@@ -9,6 +9,9 @@
   --panel-edge: #e6e4de;
   --panel-accent: #c34427;
   --panel-accent-soft: #f9e9e2;
+  --panel-brand: #e74927;
+  --panel-brand-surface: #fff1e9;
+  --panel-brand-edge: #e8b1a0;
 }
 :root[data-theme="dark"] {
   --panel-canvas: #151722;
@@ -21,6 +24,8 @@
   --panel-edge: #35394b;
   --panel-accent: #ff9678;
   --panel-accent-soft: #402d2b;
+  --panel-brand-surface: #342723;
+  --panel-brand-edge: #80503d;
 }
 body {
   background: var(--panel-canvas);
@@ -395,9 +400,6 @@ html[data-theme="dark"] .ops-summary strong,
 html[data-theme="dark"] .workspace-pipeline strong {
   color: var(--panel-ink);
 }
-html[data-theme="dark"] .workspace-metrics > a:nth-child(3) {
-  background: #25312f;
-}
 html[data-theme="dark"] .workspace-stage-bar {
   background: var(--panel-raised);
 }
@@ -540,4 +542,44 @@ html[data-theme="dark"] .upload-empty {
   background: var(--panel-soft);
   border-color: var(--panel-edge);
   color: var(--panel-secondary);
+}
+
+/* VECA orange anchors the same actions and hierarchy in both themes. */
+.workspace-dashboard .workspace-welcome > div > p:first-child,
+.workspace-dashboard .workspace-metrics > a > div > svg,
+.workspace-dashboard .workspace-section-head > svg,
+.workspace-dashboard .workspace-empty > svg,
+.workspace-dashboard .workspace-row > svg {
+  color: var(--panel-accent);
+}
+.workspace-dashboard .workspace-metrics > a.workspace-metric-brand {
+  background: var(--panel-brand-surface);
+  border-color: var(--panel-brand-edge);
+}
+.workspace-dashboard .workspace-metrics > a.workspace-metric-brand strong {
+  color: var(--panel-accent);
+}
+.workspace-dashboard .workspace-metrics > a:is(:hover, :focus-visible) {
+  background: var(--panel-brand-surface);
+  border-color: var(--panel-brand-edge);
+}
+.workspace-dashboard .workspace-pipeline {
+  border-top: 3px solid var(--panel-brand);
+}
+.workspace-dashboard .workspace-section-head > a,
+.workspace-dashboard .workspace-empty a {
+  color: var(--panel-accent);
+}
+.workspace-dashboard .workspace-section-head > a:is(:hover, :focus-visible),
+.workspace-dashboard .workspace-empty a:is(:hover, :focus-visible) {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.workspace-dashboard
+  .workspace-pipeline
+  > div:last-child
+  > a:is(:hover, :focus-visible),
+.workspace-dashboard .workspace-row:is(:hover, :focus-visible) {
+  background: var(--panel-accent-soft);
+  color: var(--panel-accent);
 }

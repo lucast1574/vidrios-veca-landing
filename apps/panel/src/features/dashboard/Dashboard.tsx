@@ -127,7 +127,13 @@ export function Dashboard({ user }: { user: SessionUser }) {
       {error && <Notice error>{error}</Notice>}
       <div className="workspace-metrics">
         {cards.map(({ label, value, detail, href, Icon }) => (
-          <a href={href} key={label}>
+          <a
+            href={href}
+            key={label}
+            className={
+              href === "#projects" ? "workspace-metric-brand" : undefined
+            }
+          >
             <div>
               <span>{label}</span>
               <Icon size={20} />

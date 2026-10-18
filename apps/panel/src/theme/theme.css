@@ -249,6 +249,7 @@ html[data-theme="dark"]
 html[data-theme="dark"]
   :is(
     .workspace-metrics > a,
+    .workspace-pipeline,
     .workspace-section,
     .team-card,
     .ops-card,
@@ -330,6 +331,7 @@ html[data-theme="dark"]
     .workspace-section > p,
     .workspace-row small,
     .workspace-section-head > a,
+    .workspace-pipeline > div:last-child > a,
     .workspace-empty p,
     .ops-heading > div > p,
     .ops-heading > div > span,

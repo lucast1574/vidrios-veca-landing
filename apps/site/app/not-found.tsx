@@ -1,3 +1,4 @@
+import { Icon } from "@veca/ui/src/Icon";
 import { SiteHeader, SiteFooter } from "../components/SiteChrome";
 export default function NotFound() {
   return (
@@ -12,7 +13,10 @@ export default function NotFound() {
         </h1>
         <p>Explora nuestras soluciones o vuelve a los proyectos.</p>
         <a className="button button-orange" href="/proyectos/">
-          Explorar proyectos <span>↗</span>
+          Explorar proyectos{" "}
+          <span>
+            <Icon name="arrow-up-right" />
+          </span>
         </a>
       </main>
       <SiteFooter />

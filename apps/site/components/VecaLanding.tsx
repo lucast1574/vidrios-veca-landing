@@ -2,6 +2,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { SOLUTION_SLOTS, type Project } from "@veca/content";
 import { SiteFooter } from "./SiteChrome";
+import { Icon } from "@veca/ui/src/Icon";
 import { WHATSAPP, questions } from "./landing/content";
 import { Arrow, Action } from "./landing/Controls";
 import { SolutionExplorer } from "./landing/SolutionExplorer";
@@ -244,7 +245,7 @@ export function VecaLanding({
               <details key={q}>
                 <summary>
                   {q}
-                  <span aria-hidden="true">+</span>
+                  <Icon name="plus" />
                 </summary>
                 <p>{a}</p>
               </details>

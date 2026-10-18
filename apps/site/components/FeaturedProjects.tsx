@@ -1,3 +1,4 @@
+import { Icon } from "@veca/ui/src/Icon";
 import type { Project } from "@veca/content";
 import { CATEGORIES } from "@veca/content";
 import { ProjectGrid } from "./ProjectGrid";
@@ -20,7 +21,9 @@ export function FeaturedProjects({ items }: { items: Project[] }) {
           </p>
           <a className="showcase-action" href="/proyectos/">
             {items.length ? "Explorar proyectos" : "Entra a la galería"}
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">
+              <Icon name="arrow-up-right" />
+            </span>
           </a>
         </div>
       </div>
@@ -29,7 +32,9 @@ export function FeaturedProjects({ items }: { items: Project[] }) {
         {CATEGORIES.map((c) => (
           <a key={c.id} href={`/proyectos/categoria/${c.id}/`}>
             <span>{c.name}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">
+              <Icon name="arrow-up-right" />
+            </span>
           </a>
         ))}
       </div>

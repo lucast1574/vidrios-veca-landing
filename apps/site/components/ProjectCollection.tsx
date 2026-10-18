@@ -1,3 +1,4 @@
+import { Icon } from "@veca/ui/src/Icon";
 import { CATEGORIES, TAGS } from "@veca/content";
 import { projects } from "../lib/api";
 import { SiteHeader, SiteFooter } from "./SiteChrome";
@@ -59,8 +60,7 @@ export async function ProjectCollection({
               taxonomy.name
             ) : (
               <>
-                Espacios que cuentan{" "}
-                <span>lo que hacemos.</span>
+                Espacios que cuentan <span>lo que hacemos.</span>
               </>
             )}
           </h1>
@@ -155,7 +155,9 @@ export async function ProjectCollection({
               {tag && ` · ${tag}`}
             </p>
             {(q || tag || category) && (
-              <a href="/proyectos/">Limpiar filtros ↗</a>
+              <a href="/proyectos/">
+                Limpiar filtros <Icon name="arrow-up-right" />
+              </a>
             )}
           </div>
           {result?.items.length ? (
@@ -196,7 +198,9 @@ export async function ProjectCollection({
                 href={q || tag ? "/proyectos/" : "https://wa.me/51908917621"}
               >
                 {q || tag ? "Ver todos los proyectos" : "Cuéntanos tu idea"}
-                <span>↗</span>
+                <span>
+                  <Icon name="arrow-up-right" />
+                </span>
               </a>
             </div>
           )}
@@ -209,7 +213,10 @@ export async function ProjectCollection({
             para tu idea.
           </h2>
           <a href="https://wa.me/51908917621" className="button button-orange">
-            Hablemos de tu proyecto <span>↗</span>
+            Hablemos de tu proyecto{" "}
+            <span>
+              <Icon name="arrow-up-right" />
+            </span>
           </a>
         </section>
       </main>

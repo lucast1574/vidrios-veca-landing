@@ -55,3 +55,5 @@ Sin focus outlines, focus rings ni sombras que simulen anillos. Mantener teclado
 ## Verificación
 
 Revisar ambos temas en el dashboard real, con ancho de escritorio y móvil. Verificar el resultado publicado además del build. Una skill de branding no sustituye la validación de CSS calculado y contraste.
+
+Sin emojis ni flechas Unicode decorativas en móvil o escritorio. Usar `packages/ui/src/Icon.tsx` o SVG del mismo sistema visual, también en tarjetas públicas y formularios.

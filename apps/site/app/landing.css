@@ -1665,3 +1665,71 @@ html:has(.ve-home) {
     animation: none;
   }
 }
+
+/* One vector language on every platform; no OS-dependent decorative glyphs. */
+.ve-icon {
+  display: inline-block;
+  vertical-align: -0.18em;
+  flex-shrink: 0;
+}
+.ve-footer-bottom a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ve-logo-entrance > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.ve-questions details[open] summary > .ve-icon {
+  transform: rotate(45deg);
+}
+.ve-questions summary > .ve-icon {
+  transition: transform 0.25s;
+}
+.ve-hero-image:after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    105deg,
+    transparent 43%,
+    #ffffff22 49%,
+    transparent 55%
+  );
+  pointer-events: none;
+  animation: ve-glass-light 2.2s 0.4s ease-out both;
+}
+@keyframes ve-glass-light {
+  from {
+    transform: translateX(-42%);
+  }
+  to {
+    transform: translateX(42%);
+  }
+}
+@supports (animation-timeline: view()) {
+  .ve-statement > img {
+    animation: ve-glass-depth linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+  @keyframes ve-glass-depth {
+    from {
+      transform: scale(1.06) translateY(-2%);
+    }
+    to {
+      transform: scale(1.06) translateY(2%);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ve-hero-image:after,
+  .ve-statement > img {
+    animation: none !important;
+  }
+  .ve-questions summary > .ve-icon {
+    transition: none;
+  }
+}

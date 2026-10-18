@@ -1,3 +1,4 @@
+import { Icon } from "./Icon";
 import React from "react";
 import { SOLUTION_SLOTS, type ProjectInput } from "@veca/content";
 export function ProjectSolutionCard({
@@ -41,11 +42,17 @@ export function ProjectSolutionCard({
         </ul>
         {href ? (
           <a href={href}>
-            Ver proyecto completo <span aria-hidden="true">↗</span>
+            Ver proyecto completo{" "}
+            <span aria-hidden="true">
+              <Icon name="arrow-up-right" />
+            </span>
           </a>
         ) : (
           <span className="solution-card-action">
-            Ver proyecto completo <span aria-hidden="true">↗</span>
+            Ver proyecto completo{" "}
+            <span aria-hidden="true">
+              <Icon name="arrow-up-right" />
+            </span>
           </span>
         )}
       </div>

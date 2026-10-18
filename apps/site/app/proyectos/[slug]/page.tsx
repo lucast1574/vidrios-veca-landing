@@ -1,3 +1,4 @@
+import { Icon } from "@veca/ui/src/Icon";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { Project } from "@veca/content";
@@ -90,7 +91,10 @@ export default async function Article({
             para ti?
           </h2>
           <a className="button button-orange" href="https://wa.me/51908917621">
-            Conversemos por WhatsApp <span>↗</span>
+            Conversemos por WhatsApp{" "}
+            <span>
+              <Icon name="arrow-up-right" />
+            </span>
           </a>
         </section>
       </main>

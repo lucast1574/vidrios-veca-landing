@@ -1,4 +1,6 @@
 "use client";
+import { Icon } from "@veca/ui/src/Icon";
+
 import { useEffect, useState } from "react";
 /** An introduction, not a loader: content is ready and CSS always dismisses it. */
 export function LogoEntrance() {
@@ -39,7 +41,10 @@ export function LogoEntrance() {
         <span className="ve-entrance-line" />
       </div>
       <button type="button" onClick={() => setVisible(false)}>
-        Entrar al sitio <span aria-hidden="true">↗</span>
+        Entrar al sitio{" "}
+        <span aria-hidden="true">
+          <Icon name="arrow-up-right" />
+        </span>
       </button>
     </div>
   );

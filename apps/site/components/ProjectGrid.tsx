@@ -1,3 +1,4 @@
+import { Icon } from "@veca/ui/src/Icon";
 import { CATEGORIES, type Project } from "@veca/content";
 export function ProjectGrid({ items }: { items: Project[] }) {
   return (
@@ -23,7 +24,9 @@ export function ProjectGrid({ items }: { items: Project[] }) {
                   }}
                 />
               )}
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">
+                <Icon name="arrow-up-right" />
+              </span>
             </a>
             <div className="public-project-info">
               <span className="project-card-number" aria-hidden="true">
@@ -53,7 +56,10 @@ export function ProjectGrid({ items }: { items: Project[] }) {
                 className="project-read-link"
                 href={`/proyectos/${project.slug}/`}
               >
-                Conoce el proyecto <span aria-hidden="true">↗</span>
+                Conoce el proyecto{" "}
+                <span aria-hidden="true">
+                  <Icon name="arrow-up-right" />
+                </span>
               </a>
             </div>
           </article>

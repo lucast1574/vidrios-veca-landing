@@ -1,4 +1,6 @@
 "use client";
+import { Icon } from "@veca/ui/src/Icon";
+
 import { LandingNavigation } from "./landing/LandingNavigation";
 export function SiteHeader() {
   return <LandingNavigation />;
@@ -48,7 +50,9 @@ export function SiteFooter() {
       <div className="ve-footer-bottom">
         <span>© {new Date().getFullYear()} Vidrios VECA</span>
         <span>San Luis, Lima · Atención en toda Lima</span>
-        <a href="https://wa.me/51908917621">WhatsApp · +51 908 917 621 ↗</a>
+        <a href="https://wa.me/51908917621">
+          WhatsApp · +51 908 917 621 <Icon name="arrow-up-right" />
+        </a>
       </div>
     </footer>
   );

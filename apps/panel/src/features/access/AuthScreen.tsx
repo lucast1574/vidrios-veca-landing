@@ -360,6 +360,16 @@ export function AuthScreen({ onLogin }: { onLogin: (s: AuthSession) => void }) {
             Los correos corporativos verificados reciben el acceso definido por
             la empresa. Los externos esperan aprobación.
           </p>
+          <p className="auth-assurance">
+            Usamos tu nombre y correo para identificarte y gestionar el acceso.
+            <a
+              href="https://veca.com.pe/privacidad/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Política de privacidad
+            </a>
+          </p>
         </div>
       </section>
     </main>

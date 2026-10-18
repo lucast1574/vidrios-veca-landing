@@ -229,9 +229,9 @@
 .profile-session button {
   width: 100%;
   min-height: 44px;
-  color: #a9371c;
-  background: #fff8f4;
-  border-color: #ecd7ce;
+  color: var(--panel-accent);
+  background: var(--panel-accent-soft);
+  border-color: var(--panel-brand-edge);
 }
 .profile-session button:hover,
 .profile-session button:focus-visible {

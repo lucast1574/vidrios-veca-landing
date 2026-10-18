@@ -1,10 +1,17 @@
 "use client";
+import type { Project } from "@veca/content";
+import { ProjectSolutionCard } from "@veca/ui";
 import { useRef, useState } from "react";
 import { spaces } from "./content";
 import { Action, Arrow } from "./Controls";
-export function SolutionExplorer() {
+export function SolutionExplorer({ projects = [] }: { projects?: Project[] }) {
   const [active, setActive] = useState(0);
   const item = spaces[active];
+  const project = projects.find(
+    (project) =>
+      project.solutionSlot === item.id &&
+      project.images.some((image) => image.id === project.coverId),
+  );
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   function select(index: number) {
     setActive(index);
@@ -70,34 +77,45 @@ export function SolutionExplorer() {
         ))}
       </div>
       <div
-        className="ve-explorer"
+        className={project ? "ve-explorer ve-project-explorer" : "ve-explorer"}
         id="ve-solution-panel"
         role="tabpanel"
         aria-labelledby={`ve-tab-${active}`}
         tabIndex={0}
       >
-        <div className="ve-explorer-photo">
-          <img
-            key={item.image}
-            src={`/assets/${item.image}`}
-            alt={item.alt}
-            width="1600"
-            height="1067"
-            loading="lazy"
+        {project ? (
+          <ProjectSolutionCard
+            project={project}
+            href={`/proyectos/${project.slug}/`}
           />
-          <span className="ve-photo-note">Espacios para inspirar tu idea</span>
-        </div>
-        <div className="ve-explorer-copy" key={item.name}>
-          <span className="ve-small-label">{item.name}</span>
-          <h3>{item.title}</h3>
-          <p>{item.description}</p>
-          <ul>
-            {item.details.map((detail) => (
-              <li key={detail}>{detail}</li>
-            ))}
-          </ul>
-          <Action href={item.href}>Explorar esta solución</Action>
-        </div>
+        ) : (
+          <>
+            <div className="ve-explorer-photo">
+              <img
+                key={item.image}
+                src={`/assets/${item.image}`}
+                alt={item.alt}
+                width="1600"
+                height="1067"
+                loading="lazy"
+              />
+              <span className="ve-photo-note">
+                Espacios para inspirar tu idea
+              </span>
+            </div>
+            <div className="ve-explorer-copy" key={item.name}>
+              <span className="ve-small-label">{item.name}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              <ul>
+                {item.details.map((detail) => (
+                  <li key={detail}>{detail}</li>
+                ))}
+              </ul>
+              <Action href={item.href}>Explorar esta solución</Action>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

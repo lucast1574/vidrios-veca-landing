@@ -137,6 +137,50 @@ export const mediaSchema = z.object({
   positionX: z.number().min(0).max(100).default(50),
   positionY: z.number().min(0).max(100).default(50),
 });
+export const SOLUTION_SLOTS = [
+  { id: "viviendas", name: "Viviendas" },
+  { id: "edificios", name: "Edificios" },
+  { id: "interiores", name: "Interiores" },
+  { id: "remodelaciones", name: "Remodelaciones" },
+] as const;
+export const PAGE_LAYOUTS = [
+  {
+    id: "stacked",
+    name: "Imagen arriba",
+    description: "Fotos a todo el ancho y texto debajo, sección por sección.",
+  },
+  {
+    id: "alternating-left",
+    name: "Primera imagen a la izquierda",
+    description: "Fotos y texto alternan de lado en cada sección.",
+  },
+  {
+    id: "alternating-right",
+    name: "Primera imagen a la derecha",
+    description: "Texto a la izquierda al empezar; después se intercambian.",
+  },
+] as const;
+export const projectSectionSchema = z
+  .object({
+    id: z.string().min(1).max(100),
+    title: z.string().trim().max(160).default(""),
+    body: bodySchema,
+    imageIds: z.array(z.string().min(1).max(100)).max(24),
+  })
+  .strict();
+export type ProjectSection = z.infer<typeof projectSectionSchema>;
+export type PageLayout = "legacy" | (typeof PAGE_LAYOUTS)[number]["id"];
+export const projectText = (project: {
+  body: RichNode;
+  pageLayout?: PageLayout;
+  sections?: ProjectSection[];
+}): string =>
+  project.pageLayout && project.pageLayout !== "legacy"
+    ? (project.sections || [])
+        .map((section) => [section.title, plainText(section.body)].join(" "))
+        .join(" ")
+    : plainText(project.body);
+
 export const projectInputSchema = z
   .object({
     title: z
@@ -152,6 +196,14 @@ export const projectInputSchema = z
     images: z.array(mediaSchema).max(24),
     coverId: z.string().max(100).nullable(),
     coverLayout: z.enum(["top", "left", "right"]).default("top"),
+    pageLayout: z
+      .enum(["legacy", "stacked", "alternating-left", "alternating-right"])
+      .default("legacy"),
+    sections: z.array(projectSectionSchema).max(24).default([]),
+    solutionSlot: z
+      .enum(["viviendas", "edificios", "interiores", "remodelaciones"])
+      .nullable()
+      .default(null),
     featured: z.boolean().default(false),
     featuredOrder: z.number().int().min(0).max(999).default(0),
     version: z.number().int().nonnegative().optional(),
@@ -175,10 +227,43 @@ export type Project = ProjectInput & {
   };
   hasUnpublishedChanges?: boolean;
 };
+export function publicationIssues(project: ProjectInput): string[] {
+  const issues: string[] = [];
+  if (project.title.trim().length < 4)
+    issues.push("Escribe un título de al menos 4 caracteres.");
+  if (
+    !project.coverId ||
+    !project.images.find((image) => image.id === project.coverId)?.alt.trim()
+  )
+    issues.push("Selecciona una portada y escribe su descripción.");
+  if (projectText(project).trim().length < 60)
+    issues.push(
+      "Describe el proyecto con al menos 60 caracteres antes de publicarlo.",
+    );
+  if (project.images.some((image) => !image.alt.trim()))
+    issues.push("Describe todas las fotos para accesibilidad y SEO.");
+  if (
+    project.pageLayout !== "legacy" &&
+    project.sections.some(
+      (section) =>
+        !section.imageIds.length &&
+        !plainText(section.body).trim() &&
+        !section.title.trim(),
+    )
+  )
+    issues.push("Completa o quita las secciones vacías antes de publicar.");
+  if (
+    project.pageLayout !== "legacy" &&
+    !project.sections.some((section) => section.imageIds.length)
+  )
+    issues.push("Elige al menos una foto para las secciones de la página.");
+  return issues;
+}
+
 export function seoFor(project: ProjectInput, slug: string) {
   const text =
     project.excerpt ||
-    plainText(project.body) ||
+    projectText(project) ||
     `${project.title}. Proyecto de Vidrios VECA en ${project.location || "Lima"}.`;
   return {
     title: `${project.title} | Vidrios VECA`,
@@ -197,6 +282,9 @@ export const emptyProject = (): ProjectInput => ({
   images: [],
   coverId: null,
   coverLayout: "top",
+  pageLayout: "legacy",
+  sections: [],
+  solutionSlot: null,
   featured: false,
   featuredOrder: 0,
 });

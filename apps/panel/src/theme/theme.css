@@ -602,3 +602,26 @@ html[data-theme="dark"] .upload-empty {
   background: var(--panel-accent-soft);
   color: var(--panel-accent);
 }
+
+:root[data-theme] .projects-empty {
+  background: var(--panel-surface);
+  border-color: var(--panel-edge);
+  color: var(--panel-ink);
+}
+:root[data-theme] .projects-empty .overline {
+  color: var(--panel-accent);
+}
+:root[data-theme] .projects-empty > p:not(.overline) {
+  color: var(--panel-secondary);
+}
+:root[data-theme] .empty-art {
+  color: var(--panel-accent);
+}
+:root[data-theme] .empty-art:before {
+  background: var(--panel-raised);
+  border-color: var(--panel-edge);
+}
+:root[data-theme] .empty-art:after {
+  background: var(--panel-soft);
+  border-color: var(--panel-edge);
+}

@@ -4,7 +4,7 @@ import { ProjectCollection } from "../../../../components/ProjectCollection";
 export const dynamic = "force-dynamic";
 type Props = {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; tag?: string; page?: string }>;
 };
 export async function generateMetadata({ params, searchParams }: Props) {
   const { category } = await params;
@@ -19,12 +19,14 @@ export async function generateMetadata({ params, searchParams }: Props) {
         `https://veca.com.pe/proyectos/categoria/${category}/` +
         (p.page && p.page !== "1" ? `?page=${p.page}` : ""),
     },
-    robots: p.q ? { index: false, follow: true } : undefined,
+    robots: p.q || p.tag ? { index: false, follow: true } : undefined,
   };
 }
 export default async function Category({ params, searchParams }: Props) {
   const { category } = await params;
   if (!CATEGORIES.some((c) => c.id === category)) notFound();
   const p = await searchParams;
-  return <ProjectCollection category={category} q={p.q} page={p.page} />;
+  return (
+    <ProjectCollection category={category} q={p.q} tag={p.tag} page={p.page} />
+  );
 }

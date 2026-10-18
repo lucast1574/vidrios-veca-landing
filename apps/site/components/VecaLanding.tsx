@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
+import { SOLUTION_SLOTS, type Project } from "@veca/content";
+import { SiteFooter } from "./SiteChrome";
 import { WHATSAPP, questions } from "./landing/content";
 import { Arrow, Action } from "./landing/Controls";
 import { SolutionExplorer } from "./landing/SolutionExplorer";
@@ -8,9 +10,11 @@ import { ProjectContact } from "./landing/ProjectContact";
 export function VecaLanding({
   featured,
   consultationUrl,
+  solutionProjects = [],
 }: {
   featured: ReactNode;
   consultationUrl: string;
+  solutionProjects?: Project[];
 }) {
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -40,7 +44,7 @@ export function VecaLanding({
   }, []);
   return (
     <div className="ve-home" ref={root}>
-      <LandingNavigation />
+      <LandingNavigation home />
       <main id="contenido">
         <section className="ve-hero" id="inicio" aria-labelledby="ve-title">
           <a
@@ -84,20 +88,6 @@ export function VecaLanding({
               <Action href="#soluciones">Descubre las posibilidades</Action>
             </div>
           </div>
-          <div className="ve-glass-pane" aria-hidden="true">
-            <span>
-              La luz
-              <br />
-              lo cambia todo.
-            </span>
-            <svg viewBox="0 0 100 100" fill="none">
-              <path
-                d="M10 70 65 15h25L35 70H10Zm25 15 55-55v25L60 85H35Z"
-                stroke="currentColor"
-                strokeWidth=".7"
-              />
-            </svg>
-          </div>
         </section>
         <div className="ve-intro-band">
           <p>
@@ -106,14 +96,15 @@ export function VecaLanding({
             <span>Espacios que se sienten.</span>
           </p>
           <div>
-            <span>Viviendas</span>
-            <span>Edificios</span>
-            <span>Interiores</span>
-            <span>Remodelaciones</span>
+            {SOLUTION_SLOTS.map((slot) => (
+              <a key={slot.id} href={`/proyectos/categoria/${slot.id}/`}>
+                {slot.name}
+              </a>
+            ))}
           </div>
         </div>
         {featured}
-        <SolutionExplorer />
+        <SolutionExplorer projects={solutionProjects} />
         <section
           className="ve-statement ve-observe"
           aria-labelledby="ve-statement-title"
@@ -260,40 +251,7 @@ export function VecaLanding({
         </section>
         <ProjectContact submissionUrl={consultationUrl} />
       </main>
-      <footer className="ve-footer">
-        <div>
-          <a
-            className="ve-brand"
-            href="#inicio"
-            aria-label="Vidrios VECA, volver al inicio"
-          >
-            <img
-              src="/assets/logo.svg"
-              alt="Vidrios VECA"
-              width="128"
-              height="83"
-            />
-          </a>
-          <p>
-            Una nueva forma
-            <br />
-            de ver tu espacio.
-          </p>
-        </div>
-        <nav aria-label="Navegación de pie de página">
-          <a href="#soluciones">Soluciones</a>
-          <a href="/proyectos/">Proyectos</a>
-          <a href="#contacto">Contacto</a>
-          <a href="/privacidad/">Privacidad</a>
-        </nav>
-        <div className="ve-footer-bottom">
-          <span>© {new Date().getFullYear()} Vidrios VECA</span>
-          <span>San Luis, Lima · Atención en toda Lima</span>
-          <a href="#inicio">
-            Volver arriba <Arrow />
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

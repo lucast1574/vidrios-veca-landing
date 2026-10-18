@@ -1,6 +1,7 @@
 export const WHATSAPP = "https://wa.me/51908917621";
 export const spaces = [
   {
+    id: "viviendas",
     name: "Viviendas",
     title: "Abre tu casa a una nueva luz.",
     description:
@@ -11,6 +12,7 @@ export const spaces = [
     href: "/ventanas-vidrio-lima/",
   },
   {
+    id: "edificios",
     name: "Edificios",
     title: "Una visión que se construye en grande.",
     description:
@@ -21,6 +23,7 @@ export const spaces = [
     href: "/vidrios-edificios-lima/",
   },
   {
+    id: "interiores",
     name: "Interiores",
     title: "Separa ambientes. Conserva la amplitud.",
     description:
@@ -31,6 +34,7 @@ export const spaces = [
     href: "/vidrios-remodelaciones-lima/",
   },
   {
+    id: "remodelaciones",
     name: "Remodelaciones",
     title: "Mira tu espacio con otros ojos.",
     description:

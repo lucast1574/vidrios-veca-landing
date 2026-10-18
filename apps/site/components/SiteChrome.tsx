@@ -1,53 +1,7 @@
 "use client";
-import { useState } from "react";
+import { LandingNavigation } from "./landing/LandingNavigation";
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
-  return (
-    <header className="site-header">
-      <a className="brand" href="/" aria-label="Vidrios VECA, inicio">
-        <img
-          src="/assets/logo.svg"
-          alt="Vidrios VECA"
-          width="128"
-          height="83"
-        />
-      </a>
-      <nav className="desktop-nav" aria-label="Navegación principal">
-        <a href="/proyectos/">Proyectos</a>
-        <a href="/#soluciones">Soluciones</a>
-        <a href="/#nosotros">Nosotros</a>
-      </nav>
-      <a
-        className="nav-cta"
-        href="https://wa.me/51908917621"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Hablemos de tu proyecto <span>↗</span>
-      </a>
-      <button
-        className="menu-toggle"
-        aria-label={open ? "Cerrar menú" : "Abrir menú"}
-        aria-expanded={open}
-        aria-controls="site-mobile"
-        onClick={() => setOpen(!open)}
-      >
-        <span />
-        <span />
-      </button>
-      <nav
-        id="site-mobile"
-        className="mobile-nav"
-        hidden={!open}
-        aria-label="Navegación móvil"
-      >
-        <a href="/proyectos/">Proyectos</a>
-        <a href="/#soluciones">Soluciones</a>
-        <a href="/#nosotros">Nosotros</a>
-        <a href="/#contacto">Tu proyecto</a>
-      </nav>
-    </header>
-  );
+  return <LandingNavigation />;
 }
 export function WhatsAppButton() {
   return (
@@ -69,26 +23,33 @@ export function WhatsAppButton() {
 }
 export function SiteFooter() {
   return (
-    <footer>
-      <a className="brand" href="/" aria-label="Vidrios VECA, inicio">
-        <img
-          src="/assets/logo.svg"
-          alt="Vidrios VECA"
-          width="128"
-          height="83"
-        />
-      </a>
-      <p>Una nueva forma de ver tu espacio.</p>
-      <a
-        className="footer-whatsapp"
-        href="https://wa.me/51908917621"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        WhatsApp · +51 908 917 621
-      </a>
-      <a href="/privacidad/">Privacidad</a>
-      <span>VIDRIOS VECA · LIMA, PERÚ · 2026</span>
+    <footer className="ve-footer">
+      <div>
+        <a className="ve-brand" href="/" aria-label="Vidrios VECA, inicio">
+          <img
+            src="/assets/logo.svg"
+            alt="Vidrios VECA"
+            width="128"
+            height="83"
+          />
+        </a>
+        <p>
+          Una nueva forma
+          <br />
+          de ver tu espacio.
+        </p>
+      </div>
+      <nav aria-label="Navegación de pie de página">
+        <a href="/#soluciones">Soluciones</a>
+        <a href="/proyectos/">Proyectos</a>
+        <a href="/#contacto">Contacto</a>
+        <a href="/privacidad/">Privacidad</a>
+      </nav>
+      <div className="ve-footer-bottom">
+        <span>© {new Date().getFullYear()} Vidrios VECA</span>
+        <span>San Luis, Lima · Atención en toda Lima</span>
+        <a href="https://wa.me/51908917621">WhatsApp · +51 908 917 621 ↗</a>
+      </div>
     </footer>
   );
 }

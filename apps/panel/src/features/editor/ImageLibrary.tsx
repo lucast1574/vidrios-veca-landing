@@ -15,12 +15,14 @@ export function ImageLibrary({
   onChange,
   onCover,
   onInsert,
+  onBusyChange,
 }: {
+  onBusyChange?: (busy: boolean) => void;
   images: Media[];
   coverId: string | null;
   onChange: Dispatch<SetStateAction<Media[]>>;
   onCover: (id: string | null) => void;
-  onInsert: (image: Media, layout: string) => void;
+  onInsert?: (image: Media, layout: string) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -38,6 +40,7 @@ export function ImageLibrary({
       return;
     }
     setBusy(true);
+    onBusyChange?.(true);
     const added: Media[] = [];
     try {
       for (const file of files) {
@@ -55,6 +58,7 @@ export function ImageLibrary({
         setActive(added[0].id);
       }
       setBusy(false);
+      onBusyChange?.(false);
       if (input.current) input.current.value = "";
     }
   }
@@ -64,7 +68,10 @@ export function ImageLibrary({
       <div className="section-row">
         <div>
           <h3>Fotografías</h3>
-          <p>Portada, encuadre e imágenes dentro del relato.</p>
+          <p>
+            Elige una imagen principal y describe tus fotos. La portada es
+            obligatoria para publicar.
+          </p>
         </div>
         <Button
           variant="ghost"
@@ -261,22 +268,24 @@ export function ImageLibrary({
                 <Trash2 size={16} />
               </Button>
             </div>
-            <div className="insert-options">
-              <span>Insertar en el texto:</span>
-              {[
-                ["left", "Izquierda"],
-                ["wide", "Ancho completo"],
-                ["right", "Derecha"],
-              ].map(([layout, label]) => (
-                <button
-                  type="button"
-                  key={layout}
-                  onClick={() => onInsert(selected, layout)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            {onInsert && (
+              <div className="insert-options">
+                <span>Insertar en el texto:</span>
+                {[
+                  ["left", "Izquierda"],
+                  ["wide", "Ancho completo"],
+                  ["right", "Derecha"],
+                ].map(([layout, label]) => (
+                  <button
+                    type="button"
+                    key={layout}
+                    onClick={() => onInsert(selected, layout)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

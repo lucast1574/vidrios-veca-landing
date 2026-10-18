@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./legacy.css";
 import "./projects.css";
+import "./landing.css";
 import "@veca/ui/src/select.css";
 import "@veca/ui/src/article.css";
 import { WhatsAppButton } from "../components/SiteChrome";

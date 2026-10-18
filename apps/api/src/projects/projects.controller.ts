@@ -52,6 +52,10 @@ export class PublicProjectsController {
         q: z.string().max(120).default(""),
         category: z.string().max(50).default(""),
         featured: z.enum(["true", "false"]).default("false"),
+        solutionSlot: z
+          .enum(["", "viviendas", "edificios", "interiores", "remodelaciones"])
+          .default(""),
+        tag: z.enum(["", ...TAGS]).default(""),
         page: z.coerce.number().int().min(1).max(10000).default(1),
       }),
       input,
@@ -61,6 +65,8 @@ export class PublicProjectsController {
       q.category,
       q.featured === "true",
       q.page,
+      q.solutionSlot,
+      q.tag,
     );
   }
   @PublicEndpoint()

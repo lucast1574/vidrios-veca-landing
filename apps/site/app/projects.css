@@ -366,3 +366,301 @@
     padding: 25px 22px 0;
   }
 }
+
+/* The gallery shares the landing's typography, palette and floating navigation. */
+.collection-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 30px;
+  color: #242641;
+}
+.collection-brand img {
+  border-radius: 10px;
+}
+.project-collection .collection-heading {
+  padding-top: 42px;
+  padding-bottom: 32px;
+}
+.collection-heading h1 {
+  font-size: clamp(38px, 5vw, 74px);
+}
+.collection-heading h1 span {
+  color: #646879;
+}
+.collection-heading > p:last-child {
+  color: #646879;
+}
+.project-collection .collection-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+  padding-bottom: 28px;
+}
+.project-search {
+  width: 100%;
+}
+.project-search > label {
+  color: #c34427;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.project-search > div {
+  border: 1px solid #d9d4cc;
+  background: #fff;
+  padding: 6px 12px 6px 22px;
+  border-radius: 12px;
+  gap: 12px;
+}
+.project-search input {
+  font-size: 17px;
+  padding: 17px 0;
+}
+.project-search input::placeholder {
+  color: #737583;
+}
+.project-search button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #e74927;
+  color: #fff;
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 13px 18px;
+  font-size: 12px;
+}
+.project-search button:is(:hover, :focus-visible) {
+  background: #c34427;
+  outline: none;
+  box-shadow: none;
+}
+.category-filters > a {
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #646879;
+}
+.category-filters > a[aria-current="page"] {
+  background: #242641;
+  color: #fff;
+}
+.category-filters > a:is(:hover, :focus-visible),
+.project-tag-filters > a:is(:hover, :focus-visible) {
+  background: #f9e9e2;
+  color: #c34427;
+  outline: none;
+  box-shadow: none;
+}
+.project-tag-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.project-tag-filters > span {
+  font-size: 10px;
+  color: #646879;
+  margin-right: 6px;
+}
+.project-tag-filters > a {
+  border-radius: 20px;
+  border: 1px solid #e6e4de;
+  padding: 8px 11px;
+  font-size: 10px;
+  color: #646879;
+}
+.project-tag-filters > a[aria-current="page"] {
+  background: #f9e9e2;
+  color: #c34427;
+  border-color: #e8b1a0;
+}
+.collection-results-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 22px;
+}
+.collection-results-head .collection-count {
+  margin: 0;
+  color: #646879;
+  font-size: 12px;
+}
+.collection-results-head > a {
+  font-size: 11px;
+  color: #c34427;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.public-project-card {
+  border-bottom: 1px solid #d7d4ce;
+}
+.public-project-photo {
+  border-radius: 10px;
+  aspect-ratio: 1.25;
+}
+.public-project-info {
+  position: relative;
+  padding-bottom: 26px;
+}
+.project-card-number {
+  position: absolute;
+  right: 0;
+  top: 23px;
+  font-size: 10px;
+  color: #c34427;
+}
+.public-project-info > p:first-of-type {
+  padding-right: 25px;
+  font-size: 10px;
+  color: #c34427;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+.public-project-excerpt {
+  color: #646879;
+}
+.public-project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+.public-project-tags a {
+  display: block;
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 7px 10px;
+  border: 1px solid #d7d4ce;
+  border-radius: 20px;
+  color: #646879;
+}
+.public-project-tags a:is(:hover, :focus-visible) {
+  background: #f9e9e2;
+  color: #c34427;
+  outline: none;
+  box-shadow: none;
+}
+.project-showcase .public-project-card {
+  border-color: #ffffff30;
+}
+.project-showcase .project-card-number,
+.project-showcase .public-project-info > p:first-of-type {
+  color: #ff9678;
+}
+.project-showcase .public-project-tags a {
+  color: #e2e5ed;
+  border-color: #ffffff30;
+}
+.project-showcase-invitation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px 0 0;
+  color: #d1d2df;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.project-showcase-invitation > p {
+  max-width: 560px;
+}
+@media (max-width: 600px) {
+  .project-search input {
+    font-size: 14px;
+  }
+  .project-search > div {
+    padding-left: 14px;
+  }
+  .project-search button {
+    padding: 12px;
+  }
+  .project-search button > span {
+    display: none;
+  }
+  .project-tag-filters > span {
+    flex-basis: 100%;
+    margin-bottom: 4px;
+  }
+  .public-project-info h3 {
+    font-size: 25px;
+  }
+}
+.project-search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: #fff5ef;
+}
+.project-collection .collection-heading {
+  padding-top: 28px;
+  padding-bottom: 22px;
+}
+.collection-heading .collection-brand {
+  margin: 0 24px 18px 0;
+}
+.collection-heading .breadcrumbs {
+  display: inline-flex;
+  vertical-align: middle;
+  color: #646879;
+  margin: 0 0 18px;
+  font-size: 11px;
+}
+.collection-heading .eyebrow {
+  margin-top: 8px;
+}
+.collection-heading h1 {
+  font-size: clamp(34px, 3.4vw, 52px);
+  margin: 18px 0;
+}
+.collection-heading > p:last-child {
+  max-width: 920px;
+  font-size: 13px;
+}
+.project-collection .collection-tools {
+  gap: 16px;
+  padding-bottom: 22px;
+}
+.project-browser .public-project-grid {
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  .collection-heading .collection-brand {
+    margin-right: 16px;
+    font-size: 9px;
+    gap: 8px;
+  }
+  .collection-brand img {
+    width: 34px;
+    height: 34px;
+  }
+  .collection-heading .breadcrumbs {
+    font-size: 10px;
+  }
+  .project-collection .collection-heading {
+    padding-top: 24px;
+  }
+  .project-collection .category-filters,
+  .project-tag-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .category-filters > a,
+  .project-tag-filters > a {
+    flex-shrink: 0;
+  }
+  .project-tag-filters > span {
+    flex-basis: auto;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    font-size: 9px;
+  }
+}

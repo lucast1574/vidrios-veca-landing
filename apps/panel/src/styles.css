@@ -305,14 +305,18 @@ img {
   width: 90px;
   height: 75px;
   border-radius: 6px;
-  transform: rotate(-12deg);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
   z-index: 0;
 }
 .empty-art:after {
-  transform: rotate(10deg);
+  transform: translate(-50%, -50%) rotate(10deg);
   background: #f9f7f2;
 }
 .empty-art > svg {
+  grid-area: 1 / 1;
+  position: relative;
   z-index: 1;
 }
 .projects-empty h2 {
@@ -1172,13 +1176,6 @@ img {
   }
   .preview-brand > span {
     font-size: 7px;
-  }
-  .preview-frame .article-heading h1 {
-    font-size: 30px;
-  }
-  .preview-frame .article-prose {
-    font-size: 15px;
-    padding: 20px 18px;
   }
   .preview-end {
     font-size: 12px;

@@ -15,7 +15,7 @@ const destinations = [
     href: "#contacto",
   },
 ];
-export function LandingNavigation() {
+export function LandingNavigation({ home = false }: { home?: boolean }) {
   const [open, setOpen] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -69,7 +69,11 @@ export function LandingNavigation() {
         >
           <p>Una nueva perspectiva</p>
           {destinations.map(({ name, detail, href }) => (
-            <a key={href} href={href} onClick={() => setOpen(false)}>
+            <a
+              key={href}
+              href={href.startsWith("#") && !home ? "/" + href : href}
+              onClick={() => setOpen(false)}
+            >
               <span>
                 <strong>{name}</strong>
                 <small>{detail}</small>

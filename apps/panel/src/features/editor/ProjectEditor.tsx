@@ -2,17 +2,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Check,
-  Eye,
-  Monitor,
-  Smartphone,
   Save,
-  Send,
+  ChevronLeft,
   Globe,
   Search,
   ChevronRight,
 } from "lucide-react";
 import {
   CATEGORIES,
+  SOLUTION_SLOTS,
   TAGS,
   emptyProject,
   seoFor,
@@ -21,13 +19,18 @@ import {
   type ProjectInput,
   type RichNode,
   type Media,
+  type PageLayout,
 } from "@veca/content";
-import { ProjectArticle } from "@veca/ui";
 import { Select } from "@veca/ui/src/Select";
 import { api, post } from "../../lib/api";
 import { Button, Field, Notice, Status } from "../../components/ui";
 import { RichEditor } from "./RichEditor";
 import { ImageLibrary } from "./ImageLibrary";
+import { StorySections } from "./StorySections";
+import { ProjectDesign } from "./ProjectDesign";
+import { PublishReview, PublishSuccess } from "./PublishReview";
+import { legacySections, newSection, pruneSections } from "./sections";
+import "./editor-workflow.css";
 const toInput = (project: Project): ProjectInput => {
   const {
     title,
@@ -42,6 +45,9 @@ const toInput = (project: Project): ProjectInput => {
     featured,
     featuredOrder,
     version,
+    pageLayout,
+    sections,
+    solutionSlot,
   } = project;
   return {
     title,
@@ -56,6 +62,9 @@ const toInput = (project: Project): ProjectInput => {
     featured,
     featuredOrder,
     version,
+    pageLayout: pageLayout || "legacy",
+    sections: sections || [],
+    solutionSlot: solutionSlot || null,
   };
 };
 function removeMissingImages(node: RichNode, ids: Set<string>): RichNode {
@@ -75,15 +84,33 @@ export function ProjectEditor({
   onBack: () => void;
   onSaved: (p: Project) => void;
 }) {
-  const [draft, setDraft] = useState<ProjectInput>(
-    initial ? toInput(initial) : emptyProject,
+  const [draft, setDraft] = useState<ProjectInput>(() =>
+    initial
+      ? toInput(initial)
+      : { ...emptyProject(), pageLayout: "stacked", sections: [newSection()] },
   );
   const [saved, setSaved] = useState<Project | null>(initial);
   const [dirty, setDirty] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const busy = saving || uploading;
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [preview, setPreview] = useState(false);
+  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [publishedResult, setPublishedResult] = useState<Project | null>(null);
+  function goToStep(next: 0 | 1 | 2) {
+    setStep(next);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  function chooseLayout(layout: PageLayout) {
+    setDraft((old) => ({
+      ...old,
+      pageLayout: layout,
+      sections: layout !== "legacy" ? legacySections(old) : old.sections,
+    }));
+    setDirty(true);
+    setNotice("");
+  }
   const [previewSize, setPreviewSize] = useState<"desktop" | "mobile">(
     "desktop",
   );
@@ -109,6 +136,14 @@ export function ProjectEditor({
     addEventListener("beforeunload", handler);
     return () => removeEventListener("beforeunload", handler);
   }, [dirty]);
+  useEffect(() => {
+    const preventWhileBusy = (event: Event) => {
+      if (busy) event.preventDefault();
+    };
+    window.addEventListener("veca-before-navigate", preventWhileBusy);
+    return () =>
+      window.removeEventListener("veca-before-navigate", preventWhileBusy);
+  }, [busy]);
   function accept(project: Project) {
     setSaved(project);
     setDraft(toInput(project));
@@ -134,7 +169,7 @@ export function ProjectEditor({
       )
     )
       return;
-    setBusy(true);
+    setSaving(true);
     setError("");
     setNotice("");
     try {
@@ -151,6 +186,8 @@ export function ProjectEditor({
             version: result.version,
           });
           accept(result);
+          setPublishedResult(result);
+          window.scrollTo({ top: 0, behavior: "instant" });
         }
       }
       setNotice(
@@ -163,18 +200,30 @@ export function ProjectEditor({
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
   }
   const seo = seoFor(
     draft,
     saved?.slug || slugify(draft.title) || "tu-proyecto",
   );
+  if (publishedResult)
+    return (
+      <PublishSuccess
+        project={publishedResult}
+        onBack={onBack}
+        onEdit={() => {
+          setPublishedResult(null);
+          goToStep(0);
+        }}
+      />
+    );
   return (
     <div className="editor-page">
       <header className="editor-header">
         <button
           className="back-button"
+          disabled={busy}
           onClick={() => {
             if (
               !dirty ||
@@ -199,22 +248,23 @@ export function ProjectEditor({
           </span>
         </div>
         <div className="editor-actions">
-          <Button variant="ghost" onClick={() => setPreview(!preview)}>
-            <Eye size={17} />
-            {preview ? "Volver a editar" : "Vista previa"}
-          </Button>
           <Button
             variant="ghost"
             disabled={busy}
             onClick={() => void action("save")}
           >
             <Save size={17} />
-            {busy ? "Guardando…" : "Guardar"}
+            {saving ? "Guardando…" : uploading ? "Subiendo fotos…" : "Guardar"}
           </Button>
-          <Button disabled={busy} onClick={() => void action("publish")}>
-            <Send size={16} />
-            {saved?.status === "published" ? "Publicar cambios" : "Publicar"}
-          </Button>
+          {step < 2 && (
+            <Button
+              disabled={busy}
+              onClick={() => goToStep(step === 0 ? 1 : 2)}
+            >
+              {step === 0 ? "Elegir diseño" : "Revisar publicación"}
+              <ChevronRight size={17} />
+            </Button>
+          )}
         </div>
       </header>
       {error && <Notice error>{error}</Notice>}
@@ -224,287 +274,328 @@ export function ProjectEditor({
           {notice}
         </Notice>
       )}
-      {preview ? (
-        <section className="preview-section">
-          <div className="preview-toolbar">
-            <div>
-              <p className="overline">VISTA PREVIA</p>
-              <h2>Así se verá tu proyecto</h2>
-              <p>
-                Incluye tus cambios actuales, aunque todavía no los hayas
-                guardado.
-              </p>
-            </div>
-            <div className="segment">
-              <button
-                aria-label="Vista de escritorio"
-                aria-pressed={previewSize === "desktop"}
-                onClick={() => setPreviewSize("desktop")}
-              >
-                <Monitor size={18} />
-              </button>
-              <button
-                aria-label="Vista de móvil"
-                aria-pressed={previewSize === "mobile"}
-                onClick={() => setPreviewSize("mobile")}
-              >
-                <Smartphone size={18} />
-              </button>
-            </div>
-          </div>
-          <div className={`preview-frame preview-${previewSize}`}>
-            <div className="preview-brand">
-              <img src="/assets/logo.svg" alt="Vidrios VECA" />
-              <span>
-                PROYECTOS /{" "}
-                {CATEGORIES.find((c) => c.id === draft.category)?.name}
-              </span>
-            </div>
-            <ProjectArticle project={draft} />
-            <div className="preview-end">
-              ¿Damos forma a tu próximo proyecto?{" "}
-              <span>Vidrios VECA · Lima</span>
-            </div>
-          </div>
-        </section>
-      ) : (
-        <div className="editor-columns">
-          <main className="editor-main">
-            <section className="editor-intro">
-              <p className="overline">
-                ESTUDIO EDITORIAL /{" "}
-                {saved ? "EDITAR PROYECTO" : "NUEVO PROYECTO"}
-              </p>
-              <h1>Una historia que merece verse.</h1>
-              <p>
-                Del primer detalle al resultado. Dale forma al próximo proyecto
-                de VECA.
-              </p>
-            </section>
-            <section className="editor-card">
-              <Field label="Nombre del proyecto" htmlFor="title">
-                <input
-                  id="title"
-                  className="title-input"
-                  maxLength={140}
-                  placeholder="Una nueva luz para un hogar en Lima"
-                  value={draft.title}
-                  onChange={(e) => patch("title", e.target.value)}
-                />
-              </Field>
-              <Field
-                label="Resumen"
-                htmlFor="excerpt"
-                hint={`${draft.excerpt.length}/320 · También se utiliza para la descripción en buscadores.`}
-              >
-                <textarea
-                  id="excerpt"
-                  rows={3}
-                  maxLength={320}
-                  placeholder="En pocas líneas, ¿qué transformamos y qué hizo especial a este proyecto?"
-                  value={draft.excerpt}
-                  onChange={(e) => patch("excerpt", e.target.value)}
-                />
-              </Field>
-            </section>
-            <section className="editor-card">
-              <ImageLibrary
-                images={draft.images}
-                coverId={draft.coverId}
-                onChange={(images) => {
-                  setDraft((old) => {
-                    const nextImages =
-                      typeof images === "function"
-                        ? images(old.images)
-                        : images;
-                    return {
-                      ...old,
-                      images: nextImages,
-                      coverId: nextImages.some(
-                        (image) => image.id === old.coverId,
-                      )
-                        ? old.coverId
-                        : nextImages[0]?.id || null,
-                      body: removeMissingImages(
-                        old.body,
-                        new Set(nextImages.map((i) => i.id)),
-                      ),
-                    };
-                  });
-                  setDirty(true);
-                  setNotice("");
-                }}
-                onCover={(id) => patch("coverId", id)}
-                onInsert={(image, layout) => insert.current(image, layout)}
-              />
-            </section>
-            <section className="editor-card">
-              <div className="section-row">
-                <div>
-                  <h3>La historia del proyecto</h3>
-                  <p>Texto con formato y fotografías en el lugar que elijas.</p>
-                </div>
-              </div>
-              <RichEditor
-                value={draft.body}
-                onChange={(node) => patch("body", node)}
-                onReady={ready}
-              />
-            </section>
-          </main>
-          <aside className="editor-sidebar">
-            <section className="editor-card">
-              <h3>Organización</h3>
-              <Field label="Categoría" htmlFor="category">
-                <Select
-                  id="category"
-                  label="Categoría"
-                  value={draft.category}
-                  options={CATEGORIES.map((c) => ({
-                    value: c.id,
-                    label: c.name,
-                  }))}
-                  onChange={(value) => patch("category", value)}
-                />
-              </Field>
-              <Field label="Ubicación del proyecto" htmlFor="location">
-                <input
-                  id="location"
-                  value={draft.location}
-                  maxLength={100}
-                  onChange={(e) => patch("location", e.target.value)}
-                />
-              </Field>
-              <Field
-                label="Etiquetas"
-                hint="Elige hasta 8 etiquetas de la lista."
-              >
-                <div className="tag-picker">
-                  {TAGS.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      aria-pressed={draft.tags.includes(tag)}
-                      disabled={
-                        !draft.tags.includes(tag) && draft.tags.length >= 8
-                      }
-                      onClick={() =>
-                        patch(
-                          "tags",
-                          draft.tags.includes(tag)
-                            ? draft.tags.filter((t) => t !== tag)
-                            : [...draft.tags, tag],
+      <nav className="editor-steps" aria-label="Pasos de publicación">
+        {["Contenido", "Diseño y vista previa", "Publicar"].map(
+          (label, index) => (
+            <button
+              key={label}
+              type="button"
+              disabled={busy}
+              aria-current={step === index ? "step" : undefined}
+              onClick={() => goToStep(index as 0 | 1 | 2)}
+            >
+              <span>{index + 1}</span>
+              <strong>{label}</strong>
+            </button>
+          ),
+        )}
+      </nav>
+      <fieldset className="editor-workspace" disabled={busy}>
+        {step === 1 ? (
+          <ProjectDesign
+            draft={draft}
+            size={previewSize}
+            onSize={setPreviewSize}
+            onLayout={chooseLayout}
+          />
+        ) : step === 2 ? (
+          <PublishReview
+            draft={draft}
+            slug={saved?.slug || slugify(draft.title) || "tu-proyecto"}
+            busy={busy}
+            updating={saved?.status === "published"}
+            onEdit={() => goToStep(0)}
+            onPublish={() => void action("publish")}
+          />
+        ) : (
+          <div className="editor-columns">
+            <main className="editor-main">
+              <section className="editor-intro">
+                <p className="overline">
+                  ESTUDIO EDITORIAL /{" "}
+                  {saved ? "EDITAR PROYECTO" : "NUEVO PROYECTO"}
+                </p>
+                <h1>Una historia que merece verse.</h1>
+                <p>
+                  Del primer detalle al resultado. Dale forma al próximo
+                  proyecto de VECA.
+                </p>
+              </section>
+              <section className="editor-card">
+                <Field label="Nombre del proyecto" htmlFor="title">
+                  <input
+                    id="title"
+                    className="title-input"
+                    maxLength={140}
+                    placeholder="Una nueva luz para un hogar en Lima"
+                    value={draft.title}
+                    onChange={(e) => patch("title", e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label="Resumen"
+                  htmlFor="excerpt"
+                  hint={`${draft.excerpt.length}/320 · También se utiliza para la descripción en buscadores.`}
+                >
+                  <textarea
+                    id="excerpt"
+                    rows={3}
+                    maxLength={320}
+                    placeholder="En pocas líneas, ¿qué transformamos y qué hizo especial a este proyecto?"
+                    value={draft.excerpt}
+                    onChange={(e) => patch("excerpt", e.target.value)}
+                  />
+                </Field>
+              </section>
+              <section className="editor-card">
+                <ImageLibrary
+                  images={draft.images}
+                  onBusyChange={setUploading}
+                  coverId={draft.coverId}
+                  onChange={(images) => {
+                    setDraft((old) => {
+                      const nextImages =
+                        typeof images === "function"
+                          ? images(old.images)
+                          : images;
+                      return {
+                        ...old,
+                        images: nextImages,
+                        sections:
+                          !old.images.length &&
+                          old.sections.length === 1 &&
+                          !old.sections[0].imageIds.length
+                            ? [
+                                {
+                                  ...old.sections[0],
+                                  imageIds: nextImages.map((image) => image.id),
+                                },
+                              ]
+                            : pruneSections(old.sections, nextImages),
+                        coverId: nextImages.some(
+                          (image) => image.id === old.coverId,
                         )
-                      }
-                    >
-                      {draft.tags.includes(tag) && <Check size={12} />}
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </Field>
-            </section>
-            <section className="editor-card">
-              <h3>Presentación</h3>
-              <Field label="Posición de la portada" htmlFor="cover-layout">
-                <Select
-                  id="cover-layout"
-                  label="Posición de la portada"
-                  value={draft.coverLayout}
-                  options={[
-                    {
-                      value: "top",
-                      label: "Imagen debajo del título",
-                      description: "Portada a todo el ancho",
-                    },
-                    {
-                      value: "left",
-                      label: "Imagen a la izquierda",
-                      description: "Texto junto a la portada",
-                    },
-                    {
-                      value: "right",
-                      label: "Imagen a la derecha",
-                      description: "Texto junto a la portada",
-                    },
-                  ]}
-                  onChange={(value) =>
-                    patch("coverLayout", value as ProjectInput["coverLayout"])
+                          ? old.coverId
+                          : nextImages[0]?.id || null,
+                        body: removeMissingImages(
+                          old.body,
+                          new Set(nextImages.map((i) => i.id)),
+                        ),
+                      };
+                    });
+                    setDirty(true);
+                    setNotice("");
+                  }}
+                  onCover={(id) => patch("coverId", id)}
+                  onInsert={
+                    draft.pageLayout === "legacy"
+                      ? (image, layout) => insert.current(image, layout)
+                      : undefined
                   }
                 />
-              </Field>
-              <label className="checkbox-field">
-                <input
-                  type="checkbox"
-                  checked={draft.featured}
-                  onChange={(e) => patch("featured", e.target.checked)}
-                />
-                <span>
-                  <strong>Destacar en la página principal</strong>
-                  <small>
-                    Se mostrará en la selección de proyectos de portada.
-                  </small>
-                </span>
-              </label>
-              {draft.featured && (
-                <Field
-                  label="Orden en portada"
-                  htmlFor="featured-order"
-                  hint="Los números más bajos aparecen primero."
-                >
+              </section>
+              <section className="editor-card">
+                {draft.pageLayout === "legacy" ? (
+                  <>
+                    <div className="section-row">
+                      <div>
+                        <h3>La historia del proyecto</h3>
+                        <p>Este proyecto conserva su editor original.</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        onClick={() => chooseLayout("stacked")}
+                      >
+                        Organizar en secciones
+                      </Button>
+                    </div>
+                    <RichEditor
+                      value={draft.body}
+                      onChange={(node) => patch("body", node)}
+                      onReady={ready}
+                      disabled={busy}
+                    />
+                  </>
+                ) : (
+                  <StorySections
+                    sections={draft.sections}
+                    images={draft.images}
+                    disabled={busy}
+                    onChange={(sections) => patch("sections", sections)}
+                  />
+                )}
+              </section>
+            </main>
+            <aside className="editor-sidebar">
+              <section className="editor-card">
+                <h3>Organización</h3>
+                <Field label="Categoría" htmlFor="category">
+                  <Select
+                    id="category"
+                    label="Categoría"
+                    value={draft.category}
+                    options={CATEGORIES.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    }))}
+                    onChange={(value) => patch("category", value)}
+                  />
+                </Field>
+                <Field label="Ubicación del proyecto" htmlFor="location">
                   <input
-                    id="featured-order"
-                    type="number"
-                    min="0"
-                    max="999"
-                    value={draft.featuredOrder}
-                    onChange={(e) =>
-                      patch("featuredOrder", Number(e.target.value))
+                    id="location"
+                    value={draft.location}
+                    maxLength={100}
+                    onChange={(e) => patch("location", e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label="Etiquetas"
+                  hint="Elige hasta 8 etiquetas de la lista."
+                >
+                  <div className="tag-picker">
+                    {TAGS.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        aria-pressed={draft.tags.includes(tag)}
+                        disabled={
+                          !draft.tags.includes(tag) && draft.tags.length >= 8
+                        }
+                        onClick={() =>
+                          patch(
+                            "tags",
+                            draft.tags.includes(tag)
+                              ? draft.tags.filter((t) => t !== tag)
+                              : [...draft.tags, tag],
+                          )
+                        }
+                      >
+                        {draft.tags.includes(tag) && <Check size={12} />}
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+              </section>
+              <section className="editor-card">
+                <h3>En la página principal</h3>
+                <Field
+                  label="Pestaña de soluciones"
+                  hint="Al publicar, se mostrará con su imagen principal. Si eliges una pestaña que ya tiene proyecto, el último publicado será el que aparezca."
+                >
+                  <Select
+                    label="Pestaña de soluciones"
+                    value={draft.solutionSlot || "none"}
+                    options={[
+                      { value: "none", label: "No mostrar en soluciones" },
+                      ...SOLUTION_SLOTS.map((slot) => ({
+                        value: slot.id,
+                        label: slot.name,
+                      })),
+                    ]}
+                    onChange={(value) =>
+                      patch(
+                        "solutionSlot",
+                        value === "none"
+                          ? null
+                          : (value as ProjectInput["solutionSlot"]),
+                      )
                     }
                   />
                 </Field>
-              )}
-            </section>
-            <section className="editor-card seo-card">
-              <h3>
-                <Search size={17} />
-                Vista en Google
-              </h3>
-              <p className="seo-url">
-                veca.com.pe › proyectos ›{" "}
-                {saved?.slug || slugify(draft.title) || "tu-proyecto"}
-              </p>
-              <p className="seo-title">{seo.title}</p>
-              <p className="seo-description">{seo.description}</p>
-              <p className="hint">
-                Título, descripción, enlace y datos estructurados se generan
-                automáticamente al publicar. La indexación depende de Google.
-              </p>
-            </section>
-            {saved?.status === "published" && (
-              <section className="editor-card">
-                <a
-                  className="external-link"
-                  href={saved.seo.canonical}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Globe size={16} />
-                  Ver publicación
-                  <ChevronRight size={15} />
-                </a>
-                <Button
-                  variant="danger"
-                  disabled={busy}
-                  onClick={() => void action("unpublish")}
-                >
-                  Retirar de la web
-                </Button>
+                <label className="checkbox-field">
+                  <input
+                    type="checkbox"
+                    checked={draft.featured}
+                    onChange={(e) => patch("featured", e.target.checked)}
+                  />
+                  <span>
+                    <strong>Destacar entre los 3 proyectos de portada</strong>
+                    <small>
+                      Elige qué trabajos poner en el foco de la página
+                      principal.
+                    </small>
+                  </span>
+                </label>
+                {draft.featured && (
+                  <Field
+                    label="Orden en portada"
+                    htmlFor="featured-order"
+                    hint="Solo se muestran los tres primeros. Los números más bajos tienen prioridad."
+                  >
+                    <input
+                      id="featured-order"
+                      type="number"
+                      min="0"
+                      max="999"
+                      value={draft.featuredOrder}
+                      onChange={(e) =>
+                        patch("featuredOrder", Number(e.target.value))
+                      }
+                    />
+                  </Field>
+                )}
               </section>
-            )}
-          </aside>
-        </div>
-      )}
+              <section className="editor-card seo-card">
+                <h3>
+                  <Search size={17} />
+                  Vista en Google
+                </h3>
+                <p className="seo-url">
+                  veca.com.pe › proyectos ›{" "}
+                  {saved?.slug || slugify(draft.title) || "tu-proyecto"}
+                </p>
+                <p className="seo-title">{seo.title}</p>
+                <p className="seo-description">{seo.description}</p>
+                <p className="hint">
+                  Título, descripción, enlace y datos estructurados se generan
+                  automáticamente al publicar. La indexación depende de Google.
+                </p>
+              </section>
+              {saved?.status === "published" && (
+                <section className="editor-card">
+                  <a
+                    className="external-link"
+                    href={saved.seo.canonical}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Globe size={16} />
+                    Ver publicación
+                    <ChevronRight size={15} />
+                  </a>
+                  <Button
+                    variant="danger"
+                    disabled={busy}
+                    onClick={() => void action("unpublish")}
+                  >
+                    Retirar de la web
+                  </Button>
+                </section>
+              )}
+            </aside>
+          </div>
+        )}
+      </fieldset>
+      <div className="editor-step-footer">
+        {step > 0 && (
+          <Button
+            variant="ghost"
+            disabled={busy}
+            onClick={() => goToStep(step === 2 ? 1 : 0)}
+          >
+            <ChevronLeft size={17} />
+            {step === 2 ? "Volver al diseño" : "Volver al contenido"}
+          </Button>
+        )}
+        {step < 2 && (
+          <Button disabled={busy} onClick={() => goToStep(step === 0 ? 1 : 2)}>
+            {step === 0 ? "Continuar al diseño" : "Continuar a publicar"}
+            <ChevronRight size={17} />
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

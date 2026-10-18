@@ -2,13 +2,13 @@ import type { Project } from "@veca/content";
 import { CATEGORIES } from "@veca/content";
 import { ProjectGrid } from "./ProjectGrid";
 export function FeaturedProjects({ items }: { items: Project[] }) {
-  if (!items.length) return null;
   return (
     <section className="project-showcase section-pad" id="proyectos">
       <div className="project-showcase-heading">
         <div>
           <p className="eyebrow">
-            <span className="section-number">01</span> PROYECTOS VECA
+            <span className="section-number">01</span> EN EL FOCO · PROYECTOS
+            VECA
           </p>
           <h2>
             Del primer detalle.
@@ -26,7 +26,19 @@ export function FeaturedProjects({ items }: { items: Project[] }) {
           </a>
         </div>
       </div>
-      <ProjectGrid items={items.slice(0, 6)} />
+      {!!items.length ? (
+        <ProjectGrid items={items.slice(0, 3)} />
+      ) : (
+        <div className="project-showcase-invitation">
+          <p>
+            Espacios, detalles y nuevas posibilidades. Descubre las soluciones
+            que podemos crear para ti.
+          </p>
+          <a className="text-link" href="/proyectos/">
+            Entra a la galería <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      )}
       <div className="project-category-strip">
         {CATEGORIES.map((c) => (
           <a key={c.id} href={`/proyectos/categoria/${c.id}/`}>

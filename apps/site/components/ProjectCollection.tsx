@@ -1,30 +1,49 @@
-import { CATEGORIES } from "@veca/content";
+import { CATEGORIES, TAGS } from "@veca/content";
 import { projects } from "../lib/api";
 import { SiteHeader, SiteFooter } from "./SiteChrome";
 import { ProjectGrid } from "./ProjectGrid";
 export async function ProjectCollection({
   category = "",
   q = "",
+  tag = "",
   page = "1",
 }: {
   category?: string;
   q?: string;
+  tag?: string;
   page?: string;
 }) {
-  const taxonomy = CATEGORIES.find((c) => c.id === category);
+  q = typeof q === "string" ? q.slice(0, 120) : "";
+  tag = TAGS.some((value) => value === tag) ? tag : "";
+  const taxonomy = CATEGORIES.find((c) => c.id === category),
+    base = category ? `/proyectos/categoria/${category}/` : "/proyectos/";
+  const href = (path: string, values: Record<string, string>) => {
+    const query = new URLSearchParams(
+      Object.entries(values).filter(([, value]) => !!value),
+    );
+    return path + (query.size ? "?" + query.toString() : "");
+  };
   const result = await projects({
     category,
-    q: q.slice(0, 120),
+    q,
+    tag,
     page: /^[1-9]\d{0,3}$/.test(page) ? page : "1",
   }).catch(() => null);
-  const base = category ? `/proyectos/categoria/${category}/` : "/proyectos/";
   return (
     <>
       <SiteHeader />
       <main id="contenido" className="project-collection">
         <header className="collection-heading section-pad">
+          <a
+            className="collection-brand"
+            href="/"
+            aria-label="Vidrios VECA, inicio"
+          >
+            <img src="/assets/favicon.svg" alt="" width="42" height="42" />
+            <span>VIDRIOS VECA</span>
+          </a>
           <nav className="breadcrumbs" aria-label="Ruta de navegación">
-            <a href="/">Vidrios VECA</a>
+            <a href="/">Inicio</a>
             <span>/</span>
             <a href="/proyectos/">Proyectos</a>
             {taxonomy && (
@@ -34,50 +53,30 @@ export async function ProjectCollection({
               </>
             )}
           </nav>
-          <p className="eyebrow">PROYECTOS DE VIDRIOS VECA</p>
+          <p className="eyebrow">NUESTRO TRABAJO EN VIDRIO</p>
           <h1>
             {taxonomy ? (
               taxonomy.name
             ) : (
               <>
-                Cada espacio.
-                <br />
-                <span>Una nueva posibilidad.</span>
+                Espacios que cuentan{" "}
+                <span>lo que hacemos.</span>
               </>
             )}
           </h1>
           <p>
             {taxonomy
               ? taxonomy.description
-              : "Una mirada a las soluciones en vidrio para edificios, hogares y espacios que se transforman."}
+              : "Explora los proyectos de VECA. Encuentra una idea por su nombre, el espacio o el material que transforma."}
           </p>
         </header>
-        <section className="project-browser section-pad">
+        <section
+          className="project-browser section-pad"
+          aria-label="Galería de proyectos"
+        >
           <div className="collection-tools">
-            <nav
-              className="category-filters"
-              aria-label="Categorías de proyectos"
-            >
-              <a
-                href="/proyectos/"
-                aria-current={!category ? "page" : undefined}
-              >
-                Todos los proyectos
-              </a>
-              {CATEGORIES.map((c) => (
-                <a
-                  key={c.id}
-                  href={`/proyectos/categoria/${c.id}/`}
-                  aria-current={category === c.id ? "page" : undefined}
-                >
-                  {c.name}
-                </a>
-              ))}
-            </nav>
             <form className="project-search" action={base}>
-              <label htmlFor="project-search">
-                Busca una idea, un material o un proyecto
-              </label>
+              <label htmlFor="project-search">Encuentra tu inspiración</label>
               <div>
                 <input
                   type="search"
@@ -85,56 +84,94 @@ export async function ProjectCollection({
                   name="q"
                   maxLength={120}
                   defaultValue={q}
-                  placeholder="Ventanas, mamparas, Lima…"
+                  placeholder="Busca por nombre, material o distrito…"
                 />
                 <button type="submit" aria-label="Buscar proyectos">
                   <svg
                     viewBox="0 0 24 24"
-                    width="20"
+                    width="22"
+                    height="22"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.5"
+                    strokeWidth="1.7"
                     aria-hidden="true"
                   >
                     <circle cx="10.5" cy="10.5" r="6.5" />
                     <path d="m16 16 5 5" />
                   </svg>
+                  <span>Buscar</span>
                 </button>
               </div>
+              {tag && <input type="hidden" name="tag" value={tag} />}
             </form>
-          </div>
-          {!result ? (
-            <div className="collection-empty">
-              <h2>Sigamos explorando tu proyecto.</h2>
-              <p>
-                Conversa con nuestro equipo para conocer las soluciones que
-                necesita tu espacio.
-              </p>
+            <nav
+              className="category-filters"
+              aria-label="Categorías de proyectos"
+            >
               <a
-                className="button button-orange"
-                href="https://wa.me/51908917621"
+                href={href("/proyectos/", { q, tag })}
+                aria-current={!category ? "page" : undefined}
               >
-                Conversemos por WhatsApp <span>↗</span>
+                Todos los proyectos
               </a>
-            </div>
-          ) : result.items.length ? (
+              {CATEGORIES.map((c) => (
+                <a
+                  key={c.id}
+                  href={href(`/proyectos/categoria/${c.id}/`, { q, tag })}
+                  aria-current={category === c.id ? "page" : undefined}
+                >
+                  {c.name}
+                </a>
+              ))}
+            </nav>
+            <nav
+              className="project-tag-filters"
+              aria-label="Filtrar proyectos por etiqueta"
+            >
+              <span>Por material o solución</span>
+              <a
+                href={href(base, { q })}
+                aria-current={!tag ? "page" : undefined}
+              >
+                Todas
+              </a>
+              {TAGS.map((value) => (
+                <a
+                  key={value}
+                  href={href(base, { q, tag: value })}
+                  aria-current={tag === value ? "page" : undefined}
+                >
+                  {value}
+                </a>
+              ))}
+            </nav>
+          </div>
+          <div className="collection-results-head">
+            <p className="collection-count">
+              {result
+                ? `${result.total} ${result.total === 1 ? "proyecto" : "proyectos"}`
+                : "Proyectos VECA"}
+              {q && ` para «${q}»`}
+              {tag && ` · ${tag}`}
+            </p>
+            {(q || tag || category) && (
+              <a href="/proyectos/">Limpiar filtros ↗</a>
+            )}
+          </div>
+          {result?.items.length ? (
             <>
-              <p className="collection-count">
-                {result.total} {result.total === 1 ? "proyecto" : "proyectos"}
-                {q && ` para «${q}»`}
-              </p>
               <ProjectGrid items={result.items} />
               <nav className="pagination" aria-label="Páginas de proyectos">
                 {result.page > 1 && (
                   <a
-                    href={`${base}?${new URLSearchParams({ q, page: String(result.page - 1) })}`}
+                    href={href(base, { q, tag, page: String(result.page - 1) })}
                   >
                     ← Anterior
                   </a>
                 )}
                 {result.page * result.pageSize < result.total && (
                   <a
-                    href={`${base}?${new URLSearchParams({ q, page: String(result.page + 1) })}`}
+                    href={href(base, { q, tag, page: String(result.page + 1) })}
                   >
                     Más proyectos →
                   </a>
@@ -143,22 +180,22 @@ export async function ProjectCollection({
             </>
           ) : (
             <div className="collection-empty">
-              <p className="eyebrow">TU PRÓXIMO PROYECTO</p>
+              <p className="eyebrow">UNA NUEVA PERSPECTIVA</p>
               <h2>
-                {q
-                  ? "Exploremos otra posibilidad."
+                {q || tag
+                  ? "Probemos otra mirada."
                   : "Imagina lo que podemos transformar."}
               </h2>
               <p>
-                {q
-                  ? "Prueba otra búsqueda o explora las categorías de proyectos."
-                  : "Una ventana, un nuevo ambiente o una fachada. Hablemos de lo que tu espacio necesita."}
+                {q || tag
+                  ? "No encontramos proyectos con esos filtros. Cambia el nombre, el material o la categoría para seguir explorando."
+                  : "Una ventana, un nuevo ambiente o una fachada. Conversemos sobre lo que tu espacio necesita."}
               </p>
               <a
                 className="button button-orange"
-                href={q ? base : "https://wa.me/51908917621"}
+                href={q || tag ? "/proyectos/" : "https://wa.me/51908917621"}
               >
-                {q ? "Ver todos los proyectos" : "Cuéntanos tu idea"}{" "}
+                {q || tag ? "Ver todos los proyectos" : "Cuéntanos tu idea"}
                 <span>↗</span>
               </a>
             </div>

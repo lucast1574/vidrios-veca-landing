@@ -8,7 +8,7 @@ import {
   projectInputSchema,
   seoFor,
   slugify,
-  plainText,
+  publicationIssues,
   type ProjectInput,
   type RichNode,
 } from "@veca/content";
@@ -82,6 +82,19 @@ export class ProjectsService {
       node.content?.forEach(walk);
     };
     walk(value.body);
+    if (new Set(value.sections.map((s) => s.id)).size !== value.sections.length)
+      throw new BadRequestException("Hay secciones duplicadas.");
+    const imageIds = new Set(value.images.map((image) => image.id));
+    for (const section of value.sections) {
+      if (
+        new Set(section.imageIds).size !== section.imageIds.length ||
+        section.imageIds.some((id) => !imageIds.has(id))
+      )
+        throw new BadRequestException(
+          "Cada sección debe usar fotos de la biblioteca, sin duplicarlas dentro de la misma sección.",
+        );
+      walk(section.body);
+    }
     return value;
   }
   async create(input: unknown) {
@@ -116,21 +129,8 @@ export class ProjectsService {
   async publish(id: string, version: number) {
     const d = await this.repo.get(id);
     const value = await this.validated(d.draft);
-    if (
-      !value.coverId ||
-      !value.images.find((i) => i.id === value.coverId)?.alt.trim()
-    )
-      throw new BadRequestException(
-        "Selecciona una portada y escribe su descripción.",
-      );
-    if (plainText(value.body).trim().length < 60)
-      throw new BadRequestException(
-        "Describe el proyecto con al menos 60 caracteres antes de publicarlo.",
-      );
-    if (value.images.some((i) => !i.alt.trim()))
-      throw new BadRequestException(
-        "Describe todas las fotos para accesibilidad y SEO.",
-      );
+    const issues = publicationIssues(value);
+    if (issues.length) throw new BadRequestException(issues[0]);
     const now = new Date().toISOString();
     const published = {
       version: version + 1,
@@ -184,9 +184,13 @@ export class ProjectsService {
     category: string,
     featured: boolean,
     page: number,
+    solutionSlot = "",
+    tag = "",
   ) {
     const filter: any = { published: { $ne: null } };
     if (category) filter["published.category"] = category;
+    if (solutionSlot) filter["published.solutionSlot"] = solutionSlot;
+    if (tag) filter["published.tags"] = tag;
     if (featured) filter["published.featured"] = true;
     if (q) {
       const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -198,9 +202,11 @@ export class ProjectsService {
     const docs = await this.repo.collection
       .find(filter)
       .sort(
-        featured
-          ? { "published.featuredOrder": 1, "published.publishedAt": -1 }
-          : { "published.publishedAt": -1 },
+        solutionSlot
+          ? { "published.updatedAt": -1, _id: -1 }
+          : featured
+            ? { "published.featuredOrder": 1, "published.publishedAt": -1 }
+            : { "published.publishedAt": -1 },
       )
       .skip((page - 1) * limit)
       .limit(limit)

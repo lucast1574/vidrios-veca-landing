@@ -20,7 +20,9 @@ import {
   Unlink,
 } from "lucide-react";
 import type { RichNode, Media } from "@veca/content";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Modal } from "../../components/Modal";
+import { Button, Field, Notice } from "../../components/ui";
 const ProjectImage = Image.extend({
   addAttributes() {
     return {
@@ -34,18 +36,26 @@ export function RichEditor({
   value,
   onChange,
   onReady,
+  label = "Contenido del proyecto",
+  disabled = false,
 }: {
   value: RichNode;
   onChange: (node: RichNode) => void;
-  onReady: (insert: (image: Media, layout: string) => void) => void;
+  onReady?: (insert: (image: Media, layout: string) => void) => void;
+  label?: string;
+  disabled?: boolean;
 }) {
+  const [linkOpen, setLinkOpen] = useState(false),
+    [linkValue, setLinkValue] = useState(""),
+    [linkError, setLinkError] = useState("");
+  const closeLink = useCallback(() => setLinkOpen(false), []);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
         link: { openOnClick: false, protocols: ["https", "http"] },
       }),
-      ProjectImage,
+      ...(onReady ? [ProjectImage] : []),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: value,
@@ -54,7 +64,7 @@ export function RichEditor({
     editorProps: {
       attributes: {
         class: "rich-document",
-        "aria-label": "Contenido del proyecto",
+        "aria-label": label,
         role: "textbox",
         "aria-multiline": "true",
       },
@@ -66,7 +76,7 @@ export function RichEditor({
     }
   }, [editor, value]);
   useEffect(() => {
-    if (editor)
+    if (editor && onReady)
       onReady((image, layout) =>
         editor
           .chain()
@@ -83,6 +93,9 @@ export function RichEditor({
           .run(),
       );
   }, [editor, onReady]);
+  useEffect(() => {
+    editor?.setEditable(!disabled, false);
+  }, [editor, disabled]);
   if (!editor) return <p>Cargando editor…</p>;
   const tools = [
     {
@@ -152,9 +165,9 @@ export function RichEditor({
       name: "Añadir enlace",
       Icon: LinkIcon,
       run: () => {
-        const url = window.prompt("Enlace completo (https://…)");
-        if (url && /^https?:\/\//i.test(url))
-          editor.chain().focus().setLink({ href: url }).run();
+        setLinkValue(String(editor.getAttributes("link").href || "https://"));
+        setLinkError("");
+        setLinkOpen(true);
       },
     },
     {
@@ -173,6 +186,23 @@ export function RichEditor({
       run: () => editor.chain().focus().redo().run(),
     },
   ];
+  function applyLink() {
+    try {
+      const url = new URL(linkValue.trim());
+      if (!["https:", "http:"].includes(url.protocol)) throw Error();
+      editor!
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: url.href })
+        .run();
+      closeLink();
+    } catch {
+      setLinkError(
+        "Escribe un enlace completo que empiece con https:// o http://.",
+      );
+    }
+  }
   return (
     <div className="rich-editor">
       <div
@@ -184,6 +214,7 @@ export function RichEditor({
           <button
             key={name}
             type="button"
+            disabled={disabled}
             aria-label={name}
             title={name}
             aria-pressed={!!active}
@@ -195,9 +226,41 @@ export function RichEditor({
       </div>
       <EditorContent editor={editor} />
       <p className="editor-tip">
-        Cuenta el reto, la solución y el resultado. Inserta las fotos desde la
-        biblioteca.
+        {onReady
+          ? "Cuenta el reto, la solución y el resultado. Inserta fotos desde la biblioteca."
+          : "Da formato al texto. Elige debajo las fotos que acompañan esta sección."}
       </p>
+      {linkOpen && (
+        <Modal
+          title="Añadir enlace"
+          description="Selecciona el texto que quieras enlazar y escribe la dirección completa."
+          onClose={closeLink}
+          footer={
+            <footer className="ve-modal-actions">
+              <Button variant="ghost" onClick={closeLink}>
+                Cancelar
+              </Button>
+              <Button onClick={applyLink}>Aplicar enlace</Button>
+            </footer>
+          }
+        >
+          <Field label="Dirección del enlace">
+            <input
+              type="url"
+              value={linkValue}
+              onChange={(event) => setLinkValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  applyLink();
+                }
+              }}
+              placeholder="https://…"
+            />
+          </Field>
+          {linkError && <Notice error>{linkError}</Notice>}
+        </Modal>
+      )}
     </div>
   );
 }

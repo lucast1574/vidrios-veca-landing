@@ -237,8 +237,10 @@ assert.ok(
 const emptyHome = await (
   await fetch(process.env.TEST_SITE_URL || "http://localhost:3380")
 ).text();
-assert.ok(!emptyHome.includes('id="proyectos"'));
-assert.ok(emptyHome.includes("Explora nuestras soluciones"));
+assert.ok(emptyHome.includes('id="proyectos"'));
+assert.ok(emptyHome.includes('href="/proyectos/"'));
+assert.ok(!emptyHome.includes('class="public-project-card"'));
+assert.ok(emptyHome.includes("Entra a la galería"));
 console.log(
   "PASS: admin authentication, CSRF, private drafts/media, image validation and S3 round-trip, publication rules, stale-save conflicts, draft isolation, filters, rendered SEO/sitemap and unpublication.",
 );

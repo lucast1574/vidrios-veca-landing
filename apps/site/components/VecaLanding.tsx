@@ -189,8 +189,8 @@ export function VecaLanding({ featured }: { featured: ReactNode }) {
             <span>Remodelaciones</span>
           </div>
         </div>
-        <SolutionExplorer />
         {featured}
+        <SolutionExplorer />
         <section
           className="ve-statement ve-observe"
           aria-labelledby="ve-statement-title"

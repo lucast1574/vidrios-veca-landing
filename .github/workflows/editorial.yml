@@ -23,7 +23,7 @@ jobs:
         run: |
           node scripts/local-qa.mjs > /tmp/veca-qa.log 2>&1 &
           qa_pid=$!
-          trap 'kill -TERM "$qa_pid" || true' EXIT
+          trap 'kill -TERM "$qa_pid" || true; wait "$qa_pid" || true' EXIT
           curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:4400/health
           curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:3380/health
           node tests/storage-unavailable.mjs || { cat /tmp/veca-qa.log; exit 1; }
@@ -31,4 +31,10 @@ jobs:
           node tests/api-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/crm-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/access-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
-          node tests/security-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
+      - name: Exercise security boundaries with a fresh rate-limit window
+        run: |
+          node scripts/local-qa.mjs > /tmp/veca-security-qa.log 2>&1 &
+          qa_pid=$!
+          trap 'kill -TERM "$qa_pid" || true; wait "$qa_pid" || true' EXIT
+          curl --retry 25 --retry-delay 1 --retry-connrefused --fail http://localhost:4400/health
+          node tests/security-flow.mjs || { cat /tmp/veca-security-qa.log; exit 1; }

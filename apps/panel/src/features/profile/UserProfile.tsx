@@ -4,7 +4,6 @@ import {
   ShieldCheck,
   Mail,
   LogOut,
-  KeyRound,
   CalendarDays,
   ArrowUpRight,
 } from "lucide-react";
@@ -72,36 +71,50 @@ export function UserProfile({
         <span>Tu información, tu acceso y tu cuenta, en un solo espacio.</span>
       </header>
       <div className="profile-layout">
-        <section className="profile-identity" aria-labelledby="profile-name">
-          <PhotoSettings user={user} onUpdate={onUpdate} />
-          <h2 id="profile-name">{user.name}</h2>
-          <p className="profile-email">{user.email || user.username}</p>
-          <span className={`profile-account-state state-${user.status}`}>
-            <span />
-            {accountStatus[user.status]}
-          </span>
-          <dl className="profile-identity-details">
-            <ProfileField label="Rol en la empresa">
-              {user.roleName || "Por asignar"}
-            </ProfileField>
-            <ProfileField label="Verificación del correo">
-              {user.emailVerified ? (
-                <>
-                  <Check size={15} />
-                  Correo verificado
-                </>
-              ) : (
-                "Pendiente de verificación"
-              )}
-            </ProfileField>
-          </dl>
-          <div className="profile-identity-note">
-            <ShieldCheck size={18} />
-            <p>
-              Tu rol y tus permisos los administra el equipo autorizado de VECA.
-            </p>
+        <div className="profile-account">
+          <section className="profile-identity" aria-labelledby="profile-name">
+            <PhotoSettings user={user} onUpdate={onUpdate} />
+            <h2 id="profile-name">{user.name}</h2>
+            <p className="profile-email">{user.email || user.username}</p>
+            <span className={`profile-account-state state-${user.status}`}>
+              <span />
+              {accountStatus[user.status]}
+            </span>
+            <dl className="profile-identity-details">
+              <ProfileField label="Rol en la empresa">
+                {user.roleName || "Por asignar"}
+              </ProfileField>
+              <ProfileField label="Verificación del correo">
+                {user.emailVerified ? (
+                  <>
+                    <Check size={15} />
+                    Correo verificado
+                  </>
+                ) : (
+                  "Pendiente de verificación"
+                )}
+              </ProfileField>
+            </dl>
+            <div className="profile-identity-note">
+              <ShieldCheck size={18} />
+              <p>
+                Tu rol y tus permisos los administra el equipo autorizado de
+                VECA.
+              </p>
+            </div>
+          </section>
+          <div className="profile-session">
+            <Button
+              variant="ghost"
+              onClick={() => void logout()}
+              disabled={busy}
+            >
+              <LogOut size={16} />
+              {busy ? "Cerrando sesión…" : "Cerrar sesión"}
+            </Button>
           </div>
-        </section>
+          {error && <Notice error>{error}</Notice>}
+        </div>
         <div className="profile-main">
           <section
             className="profile-section"
@@ -171,30 +184,6 @@ export function UserProfile({
             )}
           </section>
           <AppearanceSettings />
-          <section
-            className="profile-session"
-            aria-labelledby="profile-session-heading"
-          >
-            <div>
-              <KeyRound size={20} />
-              <div>
-                <h2 id="profile-session-heading">Tu sesión</h2>
-                <p>
-                  Al terminar de trabajar en un equipo compartido, cierra tu
-                  sesión.
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              onClick={() => void logout()}
-              disabled={busy}
-            >
-              <LogOut size={16} />
-              {busy ? "Cerrando sesión…" : "Cerrar sesión"}
-            </Button>
-          </section>
-          {error && <Notice error>{error}</Notice>}
           <p className="profile-privacy">
             Tu información permanece en el espacio privado de VECA.{" "}
             <a

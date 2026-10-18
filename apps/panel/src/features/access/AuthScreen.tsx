@@ -110,7 +110,10 @@ export function AuthScreen({ onLogin }: { onLogin: (s: AuthSession) => void }) {
           setPersistence,
           signOut,
         },
-      ] = await Promise.all([import("@firebase/app"), import("@firebase/auth")]);
+      ] = await Promise.all([
+        import("@firebase/app"),
+        import("@firebase/auth"),
+      ]);
       const app =
           getApps().find((a) => a.name === "veca-panel") ||
           initializeApp(settings.google, "veca-panel"),
@@ -354,8 +357,8 @@ export function AuthScreen({ onLogin }: { onLogin: (s: AuthSession) => void }) {
           )}
           <p className="auth-assurance">
             <ShieldCheck size={15} />
-            Los correos VECA verificados ingresan como Gerencia. Los externos
-            esperan aprobación.
+            Los correos corporativos verificados reciben el acceso definido por
+            la empresa. Los externos esperan aprobación.
           </p>
         </div>
       </section>

@@ -132,3 +132,15 @@ Un guard global protege todos los handlers. Cada endpoint público debe declarar
 `POST /auth/bootstrap` responde 404 en producción; las invitaciones se crean únicamente desde el entorno privado de confianza. Una invitación con rol asignado no evita la verificación del correo: un administrador externo invitado se activa al acreditar la identidad con Google o código, sin conceder autoaprobación a otros externos.
 
 `node tests/security-flow.mjs` comprueba todos los métodos privados sin sesión, la denegación de handlers sin metadatos, permisos y CSRF, invitaciones externas y el cierre del bootstrap en producción.
+
+### Roles en base de datos
+
+`roles` es la fuente de nombres, descripciones y permisos. Los usuarios guardan
+el ID de un documento, sin un enum de roles en el cliente o el servidor.
+`access_settings` (`name: defaults`) define `corporateDomain`, `corporateRole` y
+`bootstrapRole`. La migración `database-roles-v1` inserta los valores iniciales
+una sola vez; no sobrescribe personalizaciones ni repone roles borrados.
+El modal de Equipo consume el catálogo del servidor. Cada petición autenticada
+vuelve a resolver los permisos en MongoDB; un rol inexistente no concede acceso.
+Solo los permisos de capacidades de la aplicación tienen claves estables en código.
+El catálogo se entrega únicamente en la ruta protegida de administración de usuarios.

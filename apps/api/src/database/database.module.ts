@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from "@nestjs/common";
 import { Db, MongoClient } from "mongodb";
+import { migrateAccess } from "./access-migration";
 import { config } from "../common/config";
 @Injectable()
 export class Database implements OnModuleInit, OnModuleDestroy {
@@ -61,6 +62,7 @@ export class Database implements OnModuleInit, OnModuleDestroy {
         .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
       this.db.collection("media").createIndex({ key: 1 }, { unique: true }),
     ]);
+    await migrateAccess(this.db);
   }
   async onModuleDestroy() {
     await this.client.close();

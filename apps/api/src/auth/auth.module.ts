@@ -1,3 +1,4 @@
+import { RolesService } from "./roles.service";
 import { VerificationService } from "./verification.service";
 import { SessionGuard } from "./session.guard";
 import { Module } from "@nestjs/common";
@@ -10,11 +11,18 @@ import { AuthController } from "./auth.controller";
   controllers: [AuthController],
   providers: [
     AuthService,
+    RolesService,
     AdminGuard,
     SessionGuard,
     VerificationService,
     { provide: APP_GUARD, useClass: ApiAccessGuard },
   ],
-  exports: [AuthService, AdminGuard, SessionGuard, VerificationService],
+  exports: [
+    RolesService,
+    AuthService,
+    AdminGuard,
+    SessionGuard,
+    VerificationService,
+  ],
 })
 export class AuthModule {}

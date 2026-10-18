@@ -4,18 +4,25 @@ import { randomBytes } from "node:crypto";
 import { hash } from "argon2";
 const email = (process.env.PROVISION_EMAIL || "").trim().toLowerCase();
 const name = (process.env.PROVISION_NAME || "").trim();
-const role = process.env.PROVISION_ROLE || "admin";
-if (
-  !/^[^@\s]+@veca\.com\.pe$/.test(email) ||
-  !name ||
-  !["admin", "management"].includes(role)
-)
-  throw new Error("Set a corporate email, name and supported role explicitly.");
+const role = process.env.PROVISION_ROLE;
+if (!/^[^@\s]+@[^@\s]+$/.test(email) || !name || !role)
+  throw new Error("Set a corporate email, name and role explicitly.");
 if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is required.");
 const client = new MongoClient(process.env.MONGODB_URI);
 await client.connect();
 try {
-  const users = client.db(process.env.MONGODB_DATABASE).collection("users");
+  const db = client.db(process.env.MONGODB_DATABASE);
+  const settings = await db
+    .collection("access_settings")
+    .findOne({ name: "defaults" });
+  if (
+    email.split("@")[1] !== settings?.corporateDomain ||
+    !(await db.collection("roles").findOne({ id: role }))
+  )
+    throw new Error(
+      "Corporate domain or role is not configured in the database.",
+    );
+  const users = db.collection("users");
   if (await users.findOne({ username: email }))
     throw new Error(
       "Account already exists. Its password and permissions were not modified.",

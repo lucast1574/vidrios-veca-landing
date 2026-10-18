@@ -7,12 +7,17 @@ import {
   UserRoundCheck,
   Pause,
 } from "lucide-react";
-import { ROLES, type UserSummary, type Role } from "@veca/content";
+import {
+  type RoleDefinition,
+  type UserSummary,
+  type Role,
+} from "@veca/content";
 import { Select } from "@veca/ui/src/Select";
 import { api } from "../../lib/api";
 import { Button, Notice } from "../../components/ui";
 import { Modal } from "../../components/Modal";
 type List = {
+  roles: RoleDefinition[];
   items: UserSummary[];
   pending: number;
   total: number;
@@ -30,7 +35,7 @@ export function Team({ currentId }: { currentId: string }) {
     [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all"),
     [selected, setSelected] = useState<UserSummary | null>(null),
-    [role, setRole] = useState<Role>("commercial"),
+    [role, setRole] = useState<Role>(""),
     [status, setStatus] = useState("active"),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState("");
@@ -60,7 +65,9 @@ export function Team({ currentId }: { currentId: string }) {
   }
   function edit(user: UserSummary) {
     setSelected(user);
-    setRole(user.role || "commercial");
+    setRole(
+      user.role && data?.roles.some((r) => r.id === user.role) ? user.role : "",
+    );
     setStatus(
       user.status === "active"
         ? "active"
@@ -71,7 +78,7 @@ export function Team({ currentId }: { currentId: string }) {
     setError("");
   }
   async function save() {
-    if (!selected) return;
+    if (!selected || !role) return;
     setBusy(true);
     setError("");
     try {
@@ -153,8 +160,7 @@ export function Team({ currentId }: { currentId: string }) {
             <p>{user.email || user.username}</p>
             <span className="team-role">
               <ShieldCheck size={14} />
-              {ROLES.find((r) => r.id === user.role)?.name ||
-                "Sin rol asignado"}
+              {user.roleName || "Sin rol asignado"}
             </span>
             <div className="team-card-meta">
               <span>
@@ -207,7 +213,7 @@ export function Team({ currentId }: { currentId: string }) {
               <Button variant="ghost" onClick={close} disabled={busy}>
                 Cancelar
               </Button>
-              <Button onClick={() => void save()} disabled={busy}>
+              <Button onClick={() => void save()} disabled={busy || !role}>
                 {status === "active" ? (
                   <ShieldCheck size={16} />
                 ) : (
@@ -225,7 +231,7 @@ export function Team({ currentId }: { currentId: string }) {
           {error && <Notice error>{error}</Notice>}
           <fieldset className="role-picker">
             <legend>¿Qué necesita hacer esta persona?</legend>
-            {ROLES.map((r) => (
+            {data?.roles.map((r) => (
               <button
                 type="button"
                 key={r.id}
@@ -248,7 +254,8 @@ export function Team({ currentId }: { currentId: string }) {
           </fieldset>
           <p className="role-sections">
             Secciones:{" "}
-            {ROLES.find((r) => r.id === role)
+            {data?.roles
+              .find((r) => r.id === role)
               ?.permissions.map(
                 (p) =>
                   ({

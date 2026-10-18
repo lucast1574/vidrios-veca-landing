@@ -7,60 +7,20 @@ export const PERMISSIONS = [
   "users",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
-export const ROLES = [
-  {
-    id: "admin",
-    name: "Administrador",
-    description: "Administra usuarios, accesos y toda la operación.",
-    permissions: ["dashboard", "projects", "leads", "inventory", "users"],
-  },
-  {
-    id: "management",
-    name: "Gerencia",
-    description: "Supervisa proyectos, atención comercial, obras y almacén.",
-    permissions: ["dashboard", "projects", "leads", "inventory"],
-  },
-  {
-    id: "commercial",
-    name: "Comercial",
-    description: "Gestiona oportunidades y publica proyectos.",
-    permissions: ["dashboard", "projects", "leads"],
-  },
-  {
-    id: "operations",
-    name: "Operaciones",
-    description: "Coordina obras y registra el uso de materiales.",
-    permissions: ["dashboard", "leads", "inventory"],
-  },
-  {
-    id: "warehouse",
-    name: "Almacén",
-    description: "Controla materiales, entradas y existencias.",
-    permissions: ["dashboard", "inventory"],
-  },
-  {
-    id: "accounting",
-    name: "Contabilidad",
-    description: "Consulta el resumen general de la empresa.",
-    permissions: ["dashboard"],
-  },
-  {
-    id: "viewer",
-    name: "Consulta",
-    description: "Consulta el resumen sin modificar la operación.",
-    permissions: ["dashboard"],
-  },
-] as const;
-export const roleSchema = z.enum([
-  "admin",
-  "management",
-  "commercial",
-  "operations",
-  "warehouse",
-  "accounting",
-  "viewer",
-]);
-export type Role = z.infer<typeof roleSchema>;
+export const roleSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .regex(/^[a-z0-9][a-z0-9_-]*$/);
+export type Role = string;
+export type RoleDefinition = {
+  id: Role;
+  name: string;
+  description: string;
+  permissions: Permission[];
+  revision: number;
+};
 export const accountStatusSchema = z.enum([
   "pending",
   "active",
@@ -68,15 +28,13 @@ export const accountStatusSchema = z.enum([
   "suspended",
 ]);
 export type AccountStatus = z.infer<typeof accountStatusSchema>;
-export function permissionsFor(role: Role | null): Permission[] {
-  return [...(ROLES.find((r) => r.id === role)?.permissions || [])];
-}
 export type SessionUser = {
   id: string;
   username: string;
   name: string;
   email: string | null;
   role: Role | null;
+  roleName: string | null;
   status: AccountStatus;
   emailVerified: boolean;
   permissions: Permission[];

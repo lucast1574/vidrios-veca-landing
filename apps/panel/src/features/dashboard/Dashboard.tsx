@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   RefreshCw,
 } from "lucide-react";
-import { LEAD_STAGES, ROLES, type SessionUser } from "@veca/content";
+import { LEAD_STAGES, type SessionUser } from "@veca/content";
 import { api } from "../../lib/api";
 import { Notice } from "../../components/ui";
 import {
@@ -109,7 +109,7 @@ export function Dashboard({ user }: { user: SessionUser }) {
     <main className="ops-page workspace-dashboard">
       <div className="workspace-welcome">
         <div>
-          <p>{ROLES.find((r) => r.id === user.role)?.name} · Vidrios VECA</p>
+          <p>{user.roleName} · Vidrios VECA</p>
           <h1>
             Hola, {user.name.split(" ")[0]}
             <span>.</span>
@@ -277,8 +277,7 @@ export function Dashboard({ user }: { user: SessionUser }) {
               solicita al administrador que revise tus permisos.
             </p>
             <p>
-              <strong>{ROLES.find((r) => r.id === user.role)?.name}</strong> ·{" "}
-              {user.email}
+              <strong>{user.roleName}</strong> · {user.email}
             </p>
           </section>
         )}

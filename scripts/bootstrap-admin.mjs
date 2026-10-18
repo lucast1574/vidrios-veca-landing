@@ -4,9 +4,19 @@ import { randomBytes, createHash } from "node:crypto";
 const client = new MongoClient(process.env.MONGODB_URI);
 await client.connect();
 try {
-  const users = client
-    .db(process.env.MONGODB_DATABASE)
-    .collection("users");
+  const db = client.db(process.env.MONGODB_DATABASE);
+  const defaults = await db
+    .collection("access_settings")
+    .findOne({ name: "defaults" });
+  const role = defaults?.bootstrapRole;
+  if (
+    !role ||
+    !(await db.collection("roles").findOne({ id: role, permissions: "users" }))
+  )
+    throw new Error(
+      "Configure a valid administrator role in the database first.",
+    );
+  const users = db.collection("users");
   const existing = await users.findOne({ username: "admin" });
   if (existing?.passwordHash)
     throw new Error(
@@ -17,7 +27,7 @@ try {
     { username: "admin", passwordHash: { $in: [null] } },
     {
       $set: {
-        role: "admin",
+        role,
         passwordHash: null,
         setupHash: createHash("sha256").update(token).digest("hex"),
         setupExpires: new Date(Date.now() + 24 * 3600_000),

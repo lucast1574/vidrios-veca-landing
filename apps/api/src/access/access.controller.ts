@@ -13,7 +13,7 @@ import {
 } from "@nestjs/common";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
-import { ROLES, roleSchema, accountStatusSchema } from "@veca/content";
+import { roleSchema, accountStatusSchema } from "@veca/content";
 import { Database } from "../database/database.module";
 import { AuthModule } from "../auth/auth.module";
 import { AuthService } from "../auth/auth.service";
@@ -58,13 +58,17 @@ class UsersController {
         emailVerified: true,
       }),
     ]);
+    const roles = await this.auth.roles.list();
     return {
-      items: items.map((u) => ({
-        ...this.auth.view(u),
-        createdAt: (u.createdAt || new Date(0)).toISOString(),
-        revision: u.revision || 1,
-        provider: u.provider || "password",
-      })),
+      roles,
+      items: await Promise.all(
+        items.map(async (u) => ({
+          ...(await this.auth.view(u, roles)),
+          createdAt: (u.createdAt || new Date(0)).toISOString(),
+          revision: u.revision || 1,
+          provider: u.provider || "password",
+        })),
+      ),
       total,
       pending,
       page: p,
@@ -85,6 +89,11 @@ class UsersController {
         .strict(),
       body,
     );
+    const role = (await this.auth.roles.list()).find((r) => r.id === data.role);
+    if (!role)
+      throw new NotFoundException(
+        "El rol ya no está disponible. Actualiza la lista.",
+      );
     if (id === req.session.user.id)
       throw new ForbiddenException(
         "Otro administrador debe modificar tu acceso. Así evitamos que pierdas el control del panel.",
@@ -92,7 +101,7 @@ class UsersController {
     if (!ObjectId.isValid(id)) throw new NotFoundException();
     const user = await this.auth.users.findOne({ _id: new ObjectId(id) });
     if (!user) throw new NotFoundException();
-    if (!this.auth.view(user).emailVerified && data.status === "active")
+    if (!(await this.auth.view(user)).emailVerified && data.status === "active")
       throw new ForbiddenException(
         "La persona debe verificar su correo antes de recibir acceso.",
       );
@@ -153,7 +162,7 @@ class UsersController {
             name: saved.name,
             paragraphs: [
               saved.status === "active"
-                ? `Tu acceso fue aprobado con el rol ${ROLES.find((r) => r.id === saved.role)!.name}. Encontrarás las secciones disponibles al entrar al panel.`
+                ? `Tu acceso fue aprobado con el rol ${role.name}. Encontrarás las secciones disponibles al entrar al panel.`
                 : "Un administrador actualizó el estado de tu acceso. Si necesitas ayuda, comunícate con el equipo de VECA.",
             ],
             action: panelAction("Ir al panel"),
@@ -161,7 +170,7 @@ class UsersController {
           `access:${id}:${saved.revision}`,
         )
         .catch(() => {});
-    return { ...this.auth.view(saved), revision: saved.revision };
+    return { ...(await this.auth.view(saved)), revision: saved.revision };
   }
 }
 @RequirePermission("dashboard")

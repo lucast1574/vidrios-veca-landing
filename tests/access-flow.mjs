@@ -323,3 +323,98 @@ expect(
 console.log(
   "OTP protection passed: atomic resend cooldown and five-attempt lockout; pending sessions cannot read private photos.",
 );
+
+// Catalog, labels and permissions come from MongoDB, including brand-new role IDs.
+const { MongoClient } = await import("mongodb");
+const rolesClient = new MongoClient("mongodb://127.0.0.1:27099");
+await rolesClient.connect();
+try {
+  const db = rolesClient.db("veca_qa");
+  const roleId = "custom-" + randomUUID().slice(0, 8);
+  await db
+    .collection("roles")
+    .insertOne({
+      id: roleId,
+      name: "Coordinación técnica QA",
+      description: "Rol definido en datos",
+      permissions: ["dashboard", "leads"],
+      revision: 1,
+    });
+  let catalog = expect(await req("/admin/users", "GET", null, admin), 200).body;
+  assert.ok(catalog.roles.some((r) => r.id === roleId));
+  assert.ok(!JSON.stringify(catalog).includes("passwordHash"));
+  updated = expect(
+    await req(
+      "/admin/users/" + userId,
+      "PUT",
+      { revision: updated.revision, role: roleId, status: "active" },
+      admin,
+    ),
+    200,
+  ).body;
+  assert.equal(updated.roleName, "Coordinación técnica QA");
+  expect(await req("/admin/crm/leads", "GET", null, member), 200);
+  expect(await req("/admin/users", "GET", null, member), 403);
+  expect(
+    await req(
+      "/admin/users/" + userId,
+      "PUT",
+      { revision: updated.revision, role: "missing-role", status: "active" },
+      admin,
+    ),
+    404,
+  );
+  await db
+    .collection("roles")
+    .updateOne(
+      { id: roleId },
+      { $set: { name: "Solo almacén QA", permissions: ["inventory"] } },
+    );
+  const me = expect(await req("/auth/me", "GET", null, member), 200).body;
+  assert.equal(me.user.roleName, "Solo almacén QA");
+  assert.deepEqual(me.user.permissions, ["inventory"]);
+  expect(await req("/admin/crm/leads", "GET", null, member), 403);
+  expect(await req("/admin/crm/materials", "GET", null, member), 200);
+  await db
+    .collection("access_settings")
+    .updateOne({ name: "defaults" }, { $set: { corporateRole: roleId } });
+  try {
+    const email = `default-${randomUUID().slice(0, 8)}@veca.com.pe`;
+    const entry = expect(
+      await req("/auth/register", "POST", {
+        name: "Default QA",
+        email,
+        password,
+      }),
+      201,
+    ).body;
+    const account = expect(
+      await req("/auth/verify", "POST", {
+        challenge: entry.challenge,
+        code: await code(email),
+      }),
+      201,
+    ).body;
+    assert.equal(account.user.role, roleId);
+    assert.deepEqual(account.user.permissions, ["inventory"]);
+  } finally {
+    await db
+      .collection("access_settings")
+      .updateOne(
+        { name: "defaults" },
+        { $set: { corporateRole: "management" } },
+      );
+  }
+  await db.collection("roles").deleteOne({ id: roleId });
+  expect(await req("/admin/crm/materials", "GET", null, member), 403);
+  assert.deepEqual(
+    expect(await req("/auth/me", "GET", null, member), 200).body.user
+      .permissions,
+    [],
+  );
+  console.log(
+    "Database roles passed: arbitrary new ID, dynamic catalog and name, live permission changes, missing-role denial and database-selected corporate default.",
+  );
+} finally {
+  await rolesClient.close();
+}

@@ -12,7 +12,8 @@ import { hash, verify } from "argon2";
 import { ObjectId } from "mongodb";
 import { initializeApp, getApps } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { permissionsFor, type SessionUser } from "@veca/content";
+import { type RoleDefinition, type SessionUser } from "@veca/content";
+import { RolesService } from "./roles.service";
 import { Database } from "../database/database.module";
 import { config } from "../common/config";
 import { VerificationService } from "./verification.service";
@@ -28,13 +29,20 @@ import { digest, equal } from "./auth.crypto";
 export class AuthService {
   constructor(
     private readonly database: Database,
+    readonly roles: RolesService,
     private readonly codes: VerificationService,
     private readonly mail: MailService,
   ) {}
   get users() {
     return this.database.db.collection<UserDocument>("users");
   }
-  view(user: UserDocument): SessionUser {
+  async view(
+    user: UserDocument,
+    catalog?: RoleDefinition[],
+  ): Promise<SessionUser> {
+    const role = (catalog || (await this.roles.list())).find(
+      (r) => r.id === user.role,
+    );
     const legacy = user.username === "admin" && !user.email;
     const status = user.status || (legacy ? "active" : "pending");
     const emailVerified = user.emailVerified || legacy;
@@ -44,10 +52,13 @@ export class AuthService {
       name: user.name || (legacy ? "Administrador" : user.username),
       email: user.email || null,
       role: user.role,
+      roleName: role?.name || null,
       status,
       emailVerified,
       permissions:
-        status === "active" && emailVerified ? permissionsFor(user.role) : [],
+        status === "active" && emailVerified
+          ? [...(role?.permissions || [])]
+          : [],
     };
   }
   async prepareAdmin(key: string) {
@@ -56,11 +67,22 @@ export class AuthService {
       throw new ForbiddenException();
     if (await this.users.findOne({ username: "admin" }))
       throw new ConflictException("El administrador ya fue creado.");
+    const defaults = await this.roles.defaults();
+    const catalog = await this.roles.list();
+    if (
+      !catalog.some(
+        (r) =>
+          r.id === defaults.bootstrapRole && r.permissions.includes("users"),
+      )
+    )
+      throw new ServiceUnavailableException(
+        "Configura un rol de administración válido.",
+      );
     const token = randomBytes(32).toString("base64url");
     await this.users.insertOne({
       _id: new ObjectId(),
       username: "admin",
-      role: "admin",
+      role: defaults.bootstrapRole,
       passwordHash: null,
       setupHash: digest(token),
       setupExpires: new Date(Date.now() + 24 * 3600000),
@@ -77,7 +99,7 @@ export class AuthService {
     });
     if (!user?.passwordHash || !(await verify(user.passwordHash, password)))
       throw new UnauthorizedException("Correo o contraseña incorrectos.");
-    if (!this.view(user).emailVerified) {
+    if (!(await this.view(user)).emailVerified) {
       return {
         verificationRequired: true,
         ...(await this.codes.issue(
@@ -132,9 +154,15 @@ export class AuthService {
   private async verified(userId: ObjectId, patch: Partial<UserDocument> = {}) {
     const user = await this.users.findOne({ _id: userId });
     if (!user) throw new UnauthorizedException();
-    const corporate = user.email?.split("@")[1] === "veca.com.pe";
+    const defaults = await this.roles.defaults();
+    const catalog = await this.roles.list();
+    const corporateRole = catalog.find((r) => r.id === defaults.corporateRole);
+    const corporate =
+      user.email?.split("@")[1] === defaults.corporateDomain && !!corporateRole;
     const invited =
-      user.trustedInvitation && !!user.role && user.status === "pending";
+      user.trustedInvitation &&
+      catalog.some((r) => r.id === user.role) &&
+      user.status === "pending";
     const auto =
       (corporate || invited) &&
       (!user.emailVerified || user.status === "pending") &&
@@ -148,7 +176,9 @@ export class AuthService {
         ? {
             status: "active",
             role:
-              user.trustedInvitation && user.role ? user.role : "management",
+              user.trustedInvitation && user.role
+                ? user.role
+                : corporateRole!.id,
             approvedBy: invited
               ? "Invitación verificada"
               : "Dominio corporativo verificado",
@@ -268,7 +298,7 @@ export class AuthService {
     await this.database.db
       .collection<SessionDocument>("sessions")
       .insertOne({ userId, tokenHash: digest(token), csrf, expiresAt });
-    return { token, csrf, expiresAt, user: this.view(user) };
+    return { token, csrf, expiresAt, user: await this.view(user) };
   }
   async authenticate(token: string): Promise<AuthenticatedSession> {
     const session = await this.database.db
@@ -278,7 +308,7 @@ export class AuthService {
       throw new UnauthorizedException("Inicia sesión para continuar.");
     const user = await this.users.findOne({ _id: session.userId });
     if (!user) throw new UnauthorizedException();
-    return { ...session, user: this.view(user) };
+    return { ...session, user: await this.view(user) };
   }
   async logout(token: string) {
     await this.database.db

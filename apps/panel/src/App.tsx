@@ -2,7 +2,7 @@ import { AuthScreen } from "./features/access/AuthScreen";
 import { PendingAccess } from "./features/access/PendingAccess";
 import { Team } from "./features/access/Team";
 import { Dashboard } from "./features/dashboard/Dashboard";
-import { ROLES, type AuthSession } from "@veca/content";
+import { type AuthSession } from "@veca/content";
 import { Users, Gauge } from "lucide-react";
 import { Operations } from "./features/operations/Operations";
 import { Kanban, Package } from "lucide-react";
@@ -185,7 +185,7 @@ export default function App() {
           </div>
           <div>
             <strong>{session.user.name}</strong>
-            <small>{ROLES.find((r) => r.id === session.user.role)?.name}</small>
+            <small>{session.user.roleName}</small>
           </div>
           <button
             aria-label="Cerrar sesión"

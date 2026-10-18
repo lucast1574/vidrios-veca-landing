@@ -49,68 +49,6 @@
   margin-bottom: 23px !important;
   color: var(--ve-muted);
 }
-.ve-header {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 5vw;
-  background: var(--ve-night);
-  color: white;
-  position: relative;
-  z-index: 10;
-  gap: 25px;
-}
-.ve-brand {
-  display: block;
-  flex-shrink: 0;
-}
-.ve-brand img {
-  width: 88px;
-  height: 57px;
-  object-fit: contain;
-}
-.ve-desktop-nav {
-  display: flex;
-  gap: 35px;
-  font-size: 13px;
-}
-.ve-desktop-nav a {
-  padding: 12px 0;
-  position: relative;
-}
-.ve-desktop-nav a:after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4px;
-  height: 1px;
-  background: var(--ve-orange);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s;
-}
-.ve-desktop-nav a:hover:after {
-  transform: scaleX(1);
-}
-.ve-header-cta {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  font-size: 12px;
-  padding: 15px 0 15px 20px;
-  border-left: 1px solid #ffffff30;
-}
-.ve-header-cta svg {
-  width: 20px;
-}
-.ve-menu-button {
-  display: none;
-}
-.ve-mobile-nav[hidden] {
-  display: none;
-}
 .ve-action {
   display: inline-flex;
   align-items: center;
@@ -160,7 +98,7 @@
 }
 .ve-hero {
   min-height: 700px;
-  height: calc(100svh - 100px);
+  height: 100svh;
   max-height: 1000px;
   position: relative;
   background: var(--ve-night);
@@ -232,7 +170,7 @@
 .ve-hero-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 20px;
   padding: 20px 5vw;
   border-top: 1px solid #ffffff30;
@@ -259,6 +197,7 @@
   border-color: white;
 }
 .ve-hero-controls > a {
+  margin-left: auto;
   display: grid;
   place-items: center;
   width: 42px;
@@ -871,62 +810,8 @@
   }
 }
 @media (max-width: 760px) {
-  .ve-header {
-    height: 80px;
-    padding: 12px 22px;
-  }
-  .ve-brand img {
-    width: 72px;
-    height: 47px;
-  }
-  .ve-desktop-nav,
-  .ve-header-cta {
-    display: none;
-  }
-  .ve-menu-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 7px;
-    width: 46px;
-    height: 46px;
-    border: 1px solid #ffffff50;
-    background: transparent;
-    color: white;
-    padding: 12px;
-  }
-  .ve-menu-button span {
-    height: 1px;
-    width: 100%;
-    background: currentColor;
-    transition: transform 0.2s;
-  }
-  .ve-menu-button[aria-expanded="true"] span:first-child {
-    transform: translateY(4px) rotate(45deg);
-  }
-  .ve-menu-button[aria-expanded="true"] span:last-child {
-    transform: translateY(-4px) rotate(-45deg);
-  }
-  .ve-mobile-nav {
-    position: absolute;
-    top: 80px;
-    left: 0;
-    right: 0;
-    background: var(--ve-night);
-    padding: 18px 24px 28px;
-    box-shadow: 0 20px 30px #15203140;
-  }
-  .ve-mobile-nav a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 0;
-    border-bottom: 1px solid #ffffff25;
-    font-size: 20px;
-    letter-spacing: -0.03em;
-  }
   .ve-hero {
-    height: calc(100svh - 80px);
+    height: 100svh;
     min-height: 660px;
     max-height: 850px;
   }
@@ -1221,11 +1106,6 @@
   .ve-about-photo.ve-in-view > img {
     transform: none;
   }
-}
-/* Keep navigation available without intercepting or replacing native scrolling. */
-.ve-header {
-  position: sticky;
-  top: 0;
 }
 @media (min-width: 761px) and (max-width: 1050px) {
   .ve-tabs button {
@@ -1522,5 +1402,219 @@
   }
   .ve-inquiry-contact > a {
     font-size: 27px;
+  }
+}
+
+/* The architecture fills the viewport; navigation appears only when requested. */
+.ve-hero-brand {
+  position: absolute;
+  top: 28px;
+  left: 5vw;
+  z-index: 4;
+  padding: 5px;
+}
+.ve-hero-brand img {
+  width: 92px;
+  height: 60px;
+  object-fit: contain;
+}
+.ve-navigation {
+  position: fixed;
+  z-index: 90;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  color: #fff;
+}
+.ve-navigation-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 52px;
+  min-width: 156px;
+  margin: 0 auto;
+  padding: 13px 24px;
+  border: 1px solid #ffffff38;
+  border-radius: 30px;
+  color: #fff;
+  background: linear-gradient(120deg, #353950f5, #242641f5);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 8px 24px #10162526;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.ve-navigation-trigger:hover,
+.ve-navigation-trigger:focus-visible {
+  background: #414665;
+  color: #fff;
+  filter: none;
+}
+.ve-navigation-symbol {
+  width: 18px;
+  height: 18px;
+  position: relative;
+  display: block;
+}
+.ve-navigation-symbol span {
+  display: block;
+  width: 17px;
+  height: 2px;
+  position: absolute;
+  left: 0;
+  top: 5px;
+  background: #ff7954;
+  transform: skewX(-25deg);
+  transition:
+    transform 0.25s,
+    top 0.25s;
+}
+.ve-navigation-symbol span:last-child {
+  top: 11px;
+  width: 12px;
+}
+.ve-navigation-trigger[aria-expanded="true"] .ve-navigation-symbol span {
+  top: 8px;
+  width: 17px;
+  transform: rotate(45deg);
+}
+.ve-navigation-trigger[aria-expanded="true"]
+  .ve-navigation-symbol
+  span:last-child {
+  transform: rotate(-45deg);
+}
+.ve-navigation-panel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(390px, calc(100vw - 32px));
+  max-height: calc(100svh - 120px);
+  overflow: auto;
+  padding: 22px;
+  background: linear-gradient(135deg, #353950fc, #242641fc);
+  border: 1px solid #ffffff28;
+  border-radius: 22px;
+  box-shadow: 0 18px 60px #10162540;
+  backdrop-filter: blur(24px);
+  animation: ve-navigation-open 0.22s ease-out;
+}
+.ve-navigation-panel > p {
+  font-size: 11px;
+  color: #c1c8d0;
+  margin: 0 10px 12px;
+}
+.ve-navigation-panel > a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 12px;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+.ve-navigation-panel > a:hover,
+.ve-navigation-panel > a:focus-visible {
+  background: #ffffff0e;
+  filter: none;
+}
+.ve-navigation-panel strong {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.ve-navigation-panel small {
+  display: block;
+  color: #c1c8d0;
+  font-size: 10px;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.ve-navigation-panel > a svg {
+  color: #ff7954;
+  width: 19px;
+  height: 19px;
+}
+.ve-navigation-signature {
+  display: block;
+  margin: 16px 12px 0;
+  font-size: 10px;
+  color: #b5bdc6;
+}
+@keyframes ve-navigation-open {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (max-width: 760px) {
+  .ve-hero-brand {
+    top: 22px;
+    left: 20px;
+  }
+  .ve-hero-brand img {
+    width: 76px;
+    height: 50px;
+  }
+  .ve-hero-content {
+    padding-top: 130px;
+  }
+  .ve-navigation {
+    bottom: max(22px, env(safe-area-inset-bottom));
+  }
+  .ve-navigation-trigger {
+    min-width: 128px;
+    min-height: 48px;
+    padding: 12px 18px;
+    font-size: 12px;
+  }
+  .ve-navigation-panel {
+    padding: 16px;
+  }
+  .ve-navigation-panel strong {
+    font-size: 21px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ve-navigation-panel {
+    animation: none;
+  }
+  .ve-navigation-symbol span {
+    transition: none;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .ve-hero-controls > span {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .ve-hero-controls {
+    position: absolute;
+    top: 105px;
+    left: 24px;
+    right: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+  .ve-hero-controls > a {
+    display: none;
+  }
+  .ve-glass-pane {
+    display: none;
+  }
+  .ve-hero-content {
+    padding-bottom: 116px;
   }
 }

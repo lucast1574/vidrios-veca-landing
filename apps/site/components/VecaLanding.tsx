@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { WHATSAPP, questions } from "./landing/content";
 import { Arrow, Action } from "./landing/Controls";
 import { SolutionExplorer } from "./landing/SolutionExplorer";
+import { LandingNavigation } from "./landing/LandingNavigation";
 import { ProjectContact } from "./landing/ProjectContact";
 export function VecaLanding({
   featured,
@@ -11,20 +12,8 @@ export function VecaLanding({
   featured: ReactNode;
   consultationUrl: string;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState(0);
   const root = useRef<HTMLDivElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setMenuOpen(false);
-        menuButton.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, []);
   useEffect(() => {
     const node = root.current;
     if (!node) return;
@@ -52,59 +41,21 @@ export function VecaLanding({
   }, []);
   return (
     <div className="ve-home" ref={root}>
-      <header className="ve-header">
-        <a
-          className="ve-brand"
-          href="#inicio"
-          aria-label="Vidrios VECA, inicio"
-        >
-          <img
-            src="/assets/logo.svg"
-            alt="Vidrios VECA"
-            width="128"
-            height="83"
-          />
-        </a>
-        <nav className="ve-desktop-nav" aria-label="Navegación principal">
-          <a href="#soluciones">Soluciones</a>
-          <a href="/proyectos/">Proyectos</a>
-          <a href="#nosotros">Nosotros</a>
-        </nav>
-        <a className="ve-header-cta" href="#contacto">
-          Hablemos de tu proyecto <Arrow />
-        </a>
-        <button
-          ref={menuButton}
-          className="ve-menu-button"
-          aria-expanded={menuOpen}
-          aria-controls="ve-menu"
-          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <span />
-          <span />
-        </button>
-        <nav
-          className="ve-mobile-nav"
-          id="ve-menu"
-          aria-label="Navegación móvil"
-          hidden={!menuOpen}
-        >
-          {[
-            ["Soluciones", "#soluciones"],
-            ["Proyectos", "/proyectos/"],
-            ["Nosotros", "#nosotros"],
-            ["Tu proyecto", "#contacto"],
-          ].map(([name, href]) => (
-            <a key={name} href={href} onClick={() => setMenuOpen(false)}>
-              {name}
-              <Arrow />
-            </a>
-          ))}
-        </nav>
-      </header>
+      <LandingNavigation />
       <main id="contenido">
         <section className="ve-hero" id="inicio" aria-labelledby="ve-title">
+          <a
+            className="ve-hero-brand"
+            href="#inicio"
+            aria-label="Vidrios VECA, inicio"
+          >
+            <img
+              src="/assets/logo.svg"
+              alt="Vidrios VECA"
+              width="128"
+              height="83"
+            />
+          </a>
           <div className="ve-hero-image">
             <img
               key={view}

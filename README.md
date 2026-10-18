@@ -78,3 +78,16 @@ Si el proveedor pausa las nuevas activaciones S3, la API y el panel siguen permi
 ## Almacenamiento temporal compartido
 
 Si se utiliza temporalmente un bucket existente de otra cuenta autorizada, la API debe recibir una credencial independiente limitada a `veca/*`. Los objetos del proyecto se guardan bajo `veca/projects/`. La comprobación de disponibilidad usa `GetBucketLocation`, que permite verificar el bucket sin conceder acceso a listar archivos ajenos. La credencial principal y las de otras aplicaciones no se modifican. Al migrar al bucket propio se deben copiar y verificar los objetos antes de cambiar las variables y revocar la credencial temporal.
+
+### Architectural landing
+
+The homepage uses `VecaLanding` and the components in `apps/site/components/landing/`.
+Solution content, categories of space and contact copy live in `landing/content.ts`;
+`SolutionExplorer` supports touch, keyboard arrows, Home and End. Styling is scoped
+under `.ve-home` in `app/landing.css` so article/service pages retain their layout.
+The opening, image changes and glass treatment use CSS transforms/opacity and honor
+`prefers-reduced-motion`. Native scrolling is preserved. No animation library is added.
+Featured publications still come from the existing public API and shared project grid;
+when there are no published features, that section stays hidden. Inspiration images
+are not presented as completed VECA projects. The contact form prepares a WhatsApp
+message; it never reports that a lead was sent or saved to the database.

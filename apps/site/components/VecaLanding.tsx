@@ -4,7 +4,13 @@ import { WHATSAPP, questions } from "./landing/content";
 import { Arrow, Action } from "./landing/Controls";
 import { SolutionExplorer } from "./landing/SolutionExplorer";
 import { ProjectContact } from "./landing/ProjectContact";
-export function VecaLanding({ featured }: { featured: ReactNode }) {
+export function VecaLanding({
+  featured,
+  consultationUrl,
+}: {
+  featured: ReactNode;
+  consultationUrl: string;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState(0);
   const root = useRef<HTMLDivElement>(null);
@@ -335,7 +341,7 @@ export function VecaLanding({ featured }: { featured: ReactNode }) {
             ))}
           </div>
         </section>
-        <ProjectContact />
+        <ProjectContact submissionUrl={consultationUrl} />
       </main>
       <footer className="ve-footer">
         <div>

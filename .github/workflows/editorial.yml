@@ -29,3 +29,4 @@ jobs:
           node tests/storage-unavailable.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/bootstrap-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
           node tests/api-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }
+          node tests/crm-flow.mjs || { cat /tmp/veca-qa.log; exit 1; }

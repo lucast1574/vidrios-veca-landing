@@ -43,13 +43,13 @@ export class StorageService {
       new GetBucketLocationCommand({ Bucket: config.S3_BUCKET }),
     );
   }
-  put(key: string, body: Buffer) {
+  put(key: string, body: Buffer, contentType = "image/webp") {
     return this.client().send(
       new PutObjectCommand({
         Bucket: config.S3_BUCKET,
         Key: key,
         Body: body,
-        ContentType: "image/webp",
+        ContentType: contentType,
       }),
     );
   }

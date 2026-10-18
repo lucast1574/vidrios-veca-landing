@@ -17,6 +17,20 @@ export class Database implements OnModuleInit, OnModuleDestroy {
     await this.client.connect();
     this.db = this.client.db(config.MONGODB_DATABASE);
     await Promise.all([
+      this.db
+        .collection("crm_leads")
+        .createIndex({ submissionId: 1 }, { unique: true }),
+      this.db.collection("crm_leads").createIndex({ stage: 1, createdAt: -1 }),
+      this.db
+        .collection("inventory_materials")
+        .createIndex({ sku: 1 }, { unique: true }),
+      this.db
+        .collection("inventory_movements")
+        .createIndex({ leadId: 1, at: -1 }),
+      this.db
+        .collection("inventory_movements")
+        .createIndex({ materialId: 1, at: -1 }),
+      this.db.collection("crm_files").createIndex({ leadId: 1, createdAt: -1 }),
       this.db.collection("projects").createIndex({ slug: 1 }, { unique: true }),
       this.db
         .collection("projects")

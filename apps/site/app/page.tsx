@@ -11,6 +11,7 @@ export default async function Home() {
     <>
       <VecaLanding
         featured={<FeaturedProjects items={result?.items || []} />}
+        consultationUrl={`${process.env.PUBLIC_API_URL || "https://api.veca.com.pe"}/public/consultations`}
       />
       <script
         type="application/ld+json"

@@ -1,3 +1,5 @@
+import { Operations } from "./features/operations/Operations";
+import { Kanban, Package } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
@@ -30,7 +32,7 @@ function Login({ onLogin }: { onLogin: (s: Session) => void }) {
       <section className="login-story">
         <img src="/assets/logo.svg" alt="Vidrios VECA" />
         <div>
-          <p className="overline">ESTUDIO DE PROYECTOS</p>
+          <p className="overline">GESTIÓN VECA</p>
           <h1>
             Lo que construimos,
             <br />
@@ -55,7 +57,7 @@ function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           <p>
             {activation
               ? "Crea la contraseña del administrador para empezar."
-              : "Ingresa para administrar los proyectos de Vidrios VECA."}
+              : "Ingresa para administrar proyectos, oportunidades e inventario de Vidrios VECA."}
           </p>
           {error && <Notice error>{error}</Notice>}
           <form
@@ -125,6 +127,45 @@ function Login({ onLogin }: { onLogin: (s: Session) => void }) {
 }
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
+  const [view, setView] = useState<"projects" | "leads" | "inventory">(() =>
+    location.hash.startsWith("#leads")
+      ? "leads"
+      : location.hash.startsWith("#inventory")
+        ? "inventory"
+        : "projects",
+  );
+  useEffect(() => {
+    const change = () =>
+      setView(
+        location.hash.startsWith("#leads")
+          ? "leads"
+          : location.hash.startsWith("#inventory")
+            ? "inventory"
+            : "projects",
+      );
+    window.addEventListener("hashchange", change);
+    return () => window.removeEventListener("hashchange", change);
+  }, []);
+  function navigate(next: "projects" | "leads" | "inventory") {
+    if (
+      !window.dispatchEvent(
+        new Event("veca-before-navigate", { cancelable: true }),
+      )
+    )
+      return;
+    if (
+      editing !== undefined &&
+      view === "projects" &&
+      !confirm(
+        "Guarda los cambios del proyecto antes de cambiar de sección. ¿Continuar?",
+      )
+    )
+      return;
+    setEditing(undefined);
+    location.hash = next;
+    setView(next);
+  }
+
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState("");
@@ -179,22 +220,29 @@ export default function App() {
       <aside className="studio-nav">
         <a className="studio-brand" href="/" aria-label="Inicio del panel">
           <img src="/assets/logo.svg" alt="Vidrios VECA" />
-          <span>ESTUDIO DE PROYECTOS</span>
+          <span>GESTIÓN VECA</span>
         </a>
         <p className="nav-label">ESPACIO DE TRABAJO</p>
         <button
-          className="nav-item active"
-          onClick={() => {
-            if (
-              editing !== undefined &&
-              !confirm("¿Volver a la lista? Guarda tus cambios antes de salir.")
-            )
-              return;
-            setEditing(undefined);
-          }}
+          className={`nav-item ${view === "projects" ? "active" : ""}`}
+          onClick={() => navigate("projects")}
         >
           <LayoutGrid size={19} />
           Proyectos<span>{projects.length}</span>
+        </button>
+        <button
+          className={`nav-item ${view === "leads" ? "active" : ""}`}
+          onClick={() => navigate("leads")}
+        >
+          <Kanban size={19} />
+          Oportunidades
+        </button>
+        <button
+          className={`nav-item ${view === "inventory" ? "active" : ""}`}
+          onClick={() => navigate("inventory")}
+        >
+          <Package size={19} />
+          Inventario
         </button>
         <a
           className="nav-item"
@@ -216,6 +264,12 @@ export default function App() {
             aria-label="Cerrar sesión"
             onClick={async () => {
               if (
+                !window.dispatchEvent(
+                  new Event("veca-before-navigate", { cancelable: true }),
+                )
+              )
+                return;
+              if (
                 editing !== undefined &&
                 !confirm("¿Cerrar sesión? Guarda tus cambios antes de salir.")
               )
@@ -233,7 +287,12 @@ export default function App() {
       <div className="studio-body">
         <div className="studio-topbar">
           <span>
-            VECA <ChevronRight size={13} /> Proyectos{" "}
+            VECA <ChevronRight size={13} />{" "}
+            {view === "projects"
+              ? "Proyectos"
+              : view === "leads"
+                ? "Oportunidades"
+                : "Inventario"}{" "}
             {editing !== undefined && (
               <>
                 <ChevronRight size={13} />
@@ -253,7 +312,9 @@ export default function App() {
             habilita con una portada.
           </Notice>
         )}
-        {editing !== undefined ? (
+        {view !== "projects" ? (
+          <Operations view={view} />
+        ) : editing !== undefined ? (
           <ProjectEditor
             key={editing?.id || "new"}
             initial={editing}

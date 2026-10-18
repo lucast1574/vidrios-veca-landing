@@ -20,6 +20,19 @@ async function main() {
     allowedHeaders: ["Content-Type", "X-Veca-Csrf"],
   });
   app.use(
+    "/public/consultations",
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 10,
+      standardHeaders: "draft-8",
+      legacyHeaders: false,
+      message: {
+        message:
+          "Ya recibimos varias consultas desde esta conexión. Espera unos minutos antes de enviar otra.",
+      },
+    }),
+  );
+  app.use(
     "/auth",
     rateLimit({
       windowMs: 15 * 60 * 1000,

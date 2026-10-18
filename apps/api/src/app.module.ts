@@ -4,6 +4,7 @@ import { DatabaseModule, Database } from "./database/database.module";
 import { AuthModule } from "./auth/auth.module";
 import { ProjectsModule } from "./projects/projects.module";
 import { MediaModule } from "./media/media.module";
+import { CrmModule } from "./crm/crm.controller";
 import { AdminGuard } from "./auth/admin.guard";
 import { StorageService } from "./media/storage.service";
 @Controller()
@@ -31,7 +32,7 @@ class HealthController {
   }
 }
 @Module({
-  imports: [DatabaseModule, AuthModule, ProjectsModule, MediaModule],
+  imports: [DatabaseModule, AuthModule, ProjectsModule, MediaModule, CrmModule],
   controllers: [HealthController],
 })
 export class AppModule {}

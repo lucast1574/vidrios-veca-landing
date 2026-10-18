@@ -1,3 +1,4 @@
+import "./features/access/workspace.css";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";

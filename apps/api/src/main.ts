@@ -37,6 +37,7 @@ async function main() {
     rateLimit({
       windowMs: 15 * 60 * 1000,
       limit: 40,
+      skip: (req) => req.method === "GET",
       standardHeaders: "draft-8",
       legacyHeaders: false,
       message: { message: "Demasiados intentos. Espera unos minutos." },

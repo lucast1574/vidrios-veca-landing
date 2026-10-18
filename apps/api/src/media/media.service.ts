@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  ForbiddenException,
   NotFoundException,
 } from "@nestjs/common";
 import sharp, { type OutputInfo } from "sharp";
@@ -78,7 +79,17 @@ export class MediaService {
     const publicUse = await this.database.db
       .collection("projects")
       .countDocuments({ "published.images.id": id });
-    if (!publicUse) await this.auth.authenticate(token);
+    if (!publicUse) {
+      const session = await this.auth.authenticate(token);
+      if (
+        session.user.status !== "active" ||
+        !session.user.emailVerified ||
+        !session.user.permissions.includes("projects")
+      )
+        throw new ForbiddenException(
+          "Tu rol no permite ver estas fotos privadas.",
+        );
+    }
     return this.storage.get(media.key);
   }
 }

@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import { spawn, execFileSync } from "node:child_process";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -42,9 +43,31 @@ await db.collection("users").insertOne({
   role: "admin",
   passwordHash: await hash("Local-only-visual-test-2026!"),
 });
+const messages = [];
+const mailServer = createServer(async (req, res) => {
+  if (req.method === "GET" && req.url === "/messages") {
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(messages));
+    return;
+  }
+  if (req.method !== "POST" || req.url !== "/send") {
+    res.writeHead(404).end();
+    return;
+  }
+  let body = "";
+  for await (const chunk of req) body += chunk;
+  messages.push(JSON.parse(body));
+  if (messages.length > 200) messages.shift();
+  res.writeHead(200).end("ok");
+});
+await new Promise((resolve) => mailServer.listen(4510, "127.0.0.1", resolve));
 const env = {
   ...process.env,
   NODE_ENV: "test",
+  EMAIL_TEST_ENDPOINT: "http://127.0.0.1:4510/send",
+  FIREBASE_PROJECT_ID: "veca-local-qa",
+  FIREBASE_API_KEY: "local-public-config-only",
+  FIREBASE_AUTH_DOMAIN: "veca-local-qa.firebaseapp.com",
   ADMIN_BOOTSTRAP_KEY: "local-qa-bootstrap-key-only-at-least-32",
   PORT: "4400",
   MONGODB_URI: "mongodb://127.0.0.1:27099",
@@ -86,6 +109,7 @@ async function stop() {
   api.kill("SIGTERM");
   panel.kill("SIGTERM");
   site.kill("SIGTERM");
+  mailServer.close();
   await s3.close();
   await client.close();
   try {

@@ -1,3 +1,6 @@
+import { MailService } from "../mail/mail.service";
+import { panelAction } from "../mail/templates";
+import { config } from "../common/config";
 import { CrmEvents } from "./crm.events";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { ObjectId } from "mongodb";
@@ -17,6 +20,7 @@ export class CrmService {
   constructor(
     readonly repository: CrmRepository,
     private readonly events: CrmEvents,
+    private readonly mail: MailService,
   ) {}
   async create(
     input: unknown,
@@ -64,6 +68,43 @@ export class CrmService {
       return { reference: String(old!._id) };
     }
     this.events.emit("leads");
+    if (source === "web") {
+      await this.mail
+        .queue(
+          doc.email,
+          "Recibimos tu proyecto · Vidrios VECA",
+          {
+            title: "Tu proyecto ya está en nuestras manos",
+            preview: "Recibimos tu consulta",
+            name: doc.name,
+            paragraphs: [
+              "Gracias por contarnos lo que tienes en mente. Nuestro equipo revisará tu consulta para contactarte y coordinar el siguiente paso.",
+              `Referencia: ${String(doc._id).slice(-8).toUpperCase()}. Atención en toda Lima.`,
+            ],
+            action: {
+              label: "Conversa por WhatsApp",
+              url: "https://wa.me/51908917621",
+            },
+          },
+          `lead-received:${doc._id}`,
+        )
+        .catch(() => {});
+      await this.mail
+        .queue(
+          config.MAIL_NOTIFY_TO,
+          "Nueva consulta web · Vidrios VECA",
+          {
+            title: "Una nueva oportunidad para VECA",
+            preview: "Consulta recibida desde la web",
+            paragraphs: [
+              `${doc.name} envió una consulta desde ${doc.district}. Abre la ficha para revisar los detalles y dar seguimiento.`,
+            ],
+            action: panelAction("Ver oportunidad", `#leads/${doc._id}`),
+          },
+          `lead-team:${doc._id}`,
+        )
+        .catch(() => {});
+    }
     return { reference: String(doc._id) };
   }
   async list(search: string, page: number, stage?: string, segment?: string) {
@@ -202,6 +243,26 @@ export class CrmService {
       },
     );
     this.events.emit("leads");
+    if (changed && !["prelead", "discarded"].includes(saved.stage))
+      await this.mail
+        .queue(
+          saved.email,
+          "Seguimiento de tu proyecto · Vidrios VECA",
+          {
+            title: "Avanzamos contigo",
+            preview: "Actualización de tu consulta o proyecto",
+            name: saved.name,
+            paragraphs: [
+              `Tu proyecto pasó a la etapa: ${LEAD_STAGES.find((s) => s.id === saved.stage)!.name}. Si necesitas revisar algún detalle, nuestro equipo está disponible para ayudarte.`,
+            ],
+            action: {
+              label: "Conversa con VECA",
+              url: "https://wa.me/51908917621",
+            },
+          },
+          `lead-stage:${id}:${saved.version}`,
+        )
+        .catch(() => {});
     return saved;
   }
   async note(id: string, version: number, text: string, actor: string) {

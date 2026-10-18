@@ -55,10 +55,12 @@ const phases = [
 export function LeadDetail({
   id,
   proposal,
+  inventoryAccess = true,
   back,
 }: {
   id: string;
   proposal?: string;
+  inventoryAccess?: boolean;
   back: () => void;
 }) {
   const [data, setData] = useState<LeadDetailData | null>(null),
@@ -84,7 +86,10 @@ export function LeadDetail({
   }, [id]);
   useEffect(() => {
     void refresh();
-    void api<Material[]>("/admin/crm/materials").then(setMaterials).catch(fail);
+    if (inventoryAccess)
+      void api<Material[]>("/admin/crm/materials")
+        .then(setMaterials)
+        .catch(fail);
   }, [refresh]);
   useEffect(() => {
     if (data && proposal && LEAD_STAGES.some((s) => s.id === proposal)) {
@@ -118,7 +123,10 @@ export function LeadDetail({
         });
       })
       .catch(fail);
-    void api<Material[]>("/admin/crm/materials").then(setMaterials).catch(fail);
+    if (inventoryAccess)
+      void api<Material[]>("/admin/crm/materials")
+        .then(setMaterials)
+        .catch(fail);
   }, [id]);
   useLiveRefresh(refreshRelated);
   const dirty =
@@ -334,15 +342,17 @@ export function LeadDetail({
           ["files", "Fotos y contratos"],
           ["materials", "Materiales"],
           ["history", "Historial"],
-        ].map(([value, label]) => (
-          <button
-            key={value}
-            aria-pressed={tab === value}
-            onClick={() => setTab(value)}
-          >
-            {label}
-          </button>
-        ))}
+        ]
+          .filter(([value]) => value !== "materials" || inventoryAccess)
+          .map(([value, label]) => (
+            <button
+              key={value}
+              aria-pressed={tab === value}
+              onClick={() => setTab(value)}
+            >
+              {label}
+            </button>
+          ))}
       </nav>
       {error && <Notice error>{error}</Notice>}
       {notice && (
@@ -519,7 +529,7 @@ export function LeadDetail({
           )}
         </section>
       )}
-      {tab === "materials" && (
+      {tab === "materials" && inventoryAccess && (
         <>
           <section className="ops-card">
             <div className="ops-card-heading">

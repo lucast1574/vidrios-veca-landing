@@ -62,11 +62,16 @@ class CrmController {
   ) {
     return this.crm.create(body, "manual", req.session.user.username);
   }
-  @Get("leads/:id") async detail(@Param("id") id: string) {
+  @Get("leads/:id") async detail(
+    @Param("id") id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return {
       lead: await this.crm.get(id),
       attachments: await this.files.list(id),
-      movements: await this.inventory.movements(id),
+      movements: req.session.user.permissions.includes("inventory")
+        ? await this.inventory.movements(id)
+        : [],
     };
   }
   @Put("leads/:id") update(

@@ -1,3 +1,9 @@
+import { AuthScreen } from "./features/access/AuthScreen";
+import { PendingAccess } from "./features/access/PendingAccess";
+import { Team } from "./features/access/Team";
+import { Dashboard } from "./features/dashboard/Dashboard";
+import { ROLES, type AuthSession } from "@veca/content";
+import { Users, Gauge } from "lucide-react";
 import { Operations } from "./features/operations/Operations";
 import { Kanban, Package } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -18,135 +24,26 @@ import { CATEGORIES, type Project } from "@veca/content";
 import { api, post, setCsrf } from "./lib/api";
 import { Button, Field, Notice, Status } from "./components/ui";
 import { ProjectEditor } from "./features/editor/ProjectEditor";
-type Session = { user: { username: string }; csrf: string };
-function Login({ onLogin }: { onLogin: (s: Session) => void }) {
-  const activation = new URLSearchParams(location.hash.slice(1)).get(
-    "activate",
-  );
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("admin");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  return (
-    <main className="login-page">
-      <section className="login-story">
-        <img src="/assets/logo.svg" alt="Vidrios VECA" />
-        <div>
-          <p className="overline">GESTIÓN VECA</p>
-          <h1>
-            Lo que construimos,
-            <br />
-            <em>merece verse.</em>
-          </h1>
-          <p>
-            Un espacio para dar forma a las historias, los detalles y las nuevas
-            posibilidades de VECA.
-          </p>
-        </div>
-        <span>VIDRIOS VECA · LIMA, PERÚ</span>
-      </section>
-      <section className="login-panel">
-        <div className="login-card">
-          <div className="login-icon">
-            <LockKeyhole size={23} />
-          </div>
-          <p className="overline">ACCESO PRIVADO</p>
-          <h2>
-            {activation ? "Tu espacio está listo." : "Bienvenido de nuevo."}
-          </h2>
-          <p>
-            {activation
-              ? "Crea la contraseña del administrador para empezar."
-              : "Ingresa para administrar proyectos, oportunidades e inventario de Vidrios VECA."}
-          </p>
-          {error && <Notice error>{error}</Notice>}
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              setError("");
-              try {
-                const result = await post<Session>(
-                  activation ? "/auth/activate" : "/auth/login",
-                  activation
-                    ? { token: activation, password }
-                    : { username, password },
-                );
-                history.replaceState(null, "", location.pathname);
-                onLogin(result);
-              } catch (error) {
-                setError((error as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <Field label="Usuario" htmlFor="username">
-              <input
-                id="username"
-                autoComplete="username"
-                value={username}
-                disabled={!!activation}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </Field>
-            <Field
-              label={activation ? "Crea tu contraseña" : "Contraseña"}
-              htmlFor="password"
-              hint={
-                activation
-                  ? "Al menos 12 caracteres. Usa una contraseña única."
-                  : undefined
-              }
-            >
-              <input
-                id="password"
-                type="password"
-                autoComplete={activation ? "new-password" : "current-password"}
-                minLength={activation ? 12 : 1}
-                maxLength={256}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Field>
-            <Button disabled={busy} type="submit">
-              {busy
-                ? "Ingresando…"
-                : activation
-                  ? "Activar mi cuenta"
-                  : "Entrar al estudio"}
-              <ArrowUpRight size={18} />
-            </Button>
-          </form>
-        </div>
-      </section>
-    </main>
-  );
+type Session = AuthSession;
+type View = "dashboard" | "projects" | "leads" | "inventory" | "users";
+function currentView(): View {
+  const section = location.hash.slice(1).split("/")[0];
+  return ["projects", "leads", "inventory", "users"].includes(section)
+    ? (section as View)
+    : "dashboard";
 }
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
-  const [view, setView] = useState<"projects" | "leads" | "inventory">(() =>
-    location.hash.startsWith("#leads")
-      ? "leads"
-      : location.hash.startsWith("#inventory")
-        ? "inventory"
-        : "projects",
-  );
+  const [view, setView] = useState<View>(currentView);
   useEffect(() => {
-    const change = () =>
-      setView(
-        location.hash.startsWith("#leads")
-          ? "leads"
-          : location.hash.startsWith("#inventory")
-            ? "inventory"
-            : "projects",
-      );
+    const change = () => {
+      setView(currentView());
+      window.scrollTo({ top: 0, behavior: "instant" });
+    };
     window.addEventListener("hashchange", change);
     return () => window.removeEventListener("hashchange", change);
   }, []);
-  function navigate(next: "projects" | "leads" | "inventory") {
+  function navigate(next: View) {
     if (
       !window.dispatchEvent(
         new Event("veca-before-navigate", { cancelable: true }),
@@ -192,13 +89,23 @@ export default function App() {
       .finally(() => setLoading(false));
   }, []);
   useEffect(() => {
-    if (session) {
-      void refresh();
+    if (session?.user.status === "active") {
+      if (session.user.permissions.includes("projects")) void refresh();
       void api<{ storageConfigured: boolean }>("/admin/system")
         .then((x) => setStorageConfigured(x.storageConfigured))
         .catch(() => {});
     }
   }, [session]);
+  useEffect(() => {
+    if (!session || session.user.status !== "active") return;
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible")
+        void api<Session>("/auth/me")
+          .then(login)
+          .catch(() => setSession(null));
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [session?.user.id, session?.user.status]);
   const filtered = useMemo(
     () =>
       projects.filter(
@@ -214,7 +121,24 @@ export default function App() {
   );
   if (loading)
     return <div className="loading-screen">Abriendo el estudio de VECA…</div>;
-  if (!session) return <Login onLogin={login} />;
+  if (!session) return <AuthScreen onLogin={login} />;
+  if (session.user.status !== "active" || !session.user.emailVerified)
+    return (
+      <PendingAccess
+        session={session}
+        onUpdate={login}
+        onLogout={() => setSession(null)}
+      />
+    );
+  const can = (permission: View) =>
+    session.user.permissions.includes(permission);
+  const labels: Record<View, string> = {
+    dashboard: "Resumen",
+    projects: "Proyectos",
+    leads: "Oportunidades",
+    inventory: "Inventario",
+    users: "Equipo",
+  };
   return (
     <div className="studio-shell">
       <aside className="studio-nav">
@@ -223,27 +147,28 @@ export default function App() {
           <span>GESTIÓN VECA</span>
         </a>
         <p className="nav-label">ESPACIO DE TRABAJO</p>
-        <button
-          className={`nav-item ${view === "projects" ? "active" : ""}`}
-          onClick={() => navigate("projects")}
-        >
-          <LayoutGrid size={19} />
-          Proyectos<span>{projects.length}</span>
-        </button>
-        <button
-          className={`nav-item ${view === "leads" ? "active" : ""}`}
-          onClick={() => navigate("leads")}
-        >
-          <Kanban size={19} />
-          Oportunidades
-        </button>
-        <button
-          className={`nav-item ${view === "inventory" ? "active" : ""}`}
-          onClick={() => navigate("inventory")}
-        >
-          <Package size={19} />
-          Inventario
-        </button>
+        {(
+          [
+            { id: "dashboard", label: "Resumen", Icon: Gauge },
+            { id: "projects", label: "Proyectos", Icon: LayoutGrid },
+            { id: "leads", label: "Oportunidades", Icon: Kanban },
+            { id: "inventory", label: "Inventario", Icon: Package },
+            { id: "users", label: "Equipo", Icon: Users },
+          ] as const
+        )
+          .filter((item) => can(item.id))
+          .map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              className={`nav-item ${view === id ? "active" : ""}`}
+              onClick={() => navigate(id)}
+              title={label}
+            >
+              <Icon size={19} />
+              {label}
+              {id === "projects" && <span>{projects.length}</span>}
+            </button>
+          ))}
         <a
           className="nav-item"
           href="https://veca.com.pe"
@@ -255,10 +180,12 @@ export default function App() {
           <ArrowUpRight size={16} />
         </a>
         <div className="nav-bottom">
-          <div className="user-avatar">A</div>
+          <div className="user-avatar">
+            {session.user.name.slice(0, 1).toUpperCase()}
+          </div>
           <div>
-            <strong>Administrador</strong>
-            <small>Vidrios VECA</small>
+            <strong>{session.user.name}</strong>
+            <small>{ROLES.find((r) => r.id === session.user.role)?.name}</small>
           </div>
           <button
             aria-label="Cerrar sesión"
@@ -287,12 +214,7 @@ export default function App() {
       <div className="studio-body">
         <div className="studio-topbar">
           <span>
-            VECA <ChevronRight size={13} />{" "}
-            {view === "projects"
-              ? "Proyectos"
-              : view === "leads"
-                ? "Oportunidades"
-                : "Inventario"}{" "}
+            VECA <ChevronRight size={13} /> {labels[view]}{" "}
             {editing !== undefined && (
               <>
                 <ChevronRight size={13} />
@@ -312,8 +234,20 @@ export default function App() {
             habilita con una portada.
           </Notice>
         )}
-        {view !== "projects" ? (
-          <Operations view={view} />
+        {!can(view) ? (
+          <main className="ops-page">
+            <h1>Este espacio no está disponible para tu rol.</h1>
+            <p>Solicita al administrador que revise tus permisos.</p>
+            <Button onClick={() => navigate("dashboard")}>
+              Volver al resumen
+            </Button>
+          </main>
+        ) : view === "dashboard" ? (
+          <Dashboard user={session.user} />
+        ) : view === "users" ? (
+          <Team currentId={session.user.id} />
+        ) : view !== "projects" ? (
+          <Operations view={view} inventoryAccess={can("inventory")} />
         ) : editing !== undefined ? (
           <ProjectEditor
             key={editing?.id || "new"}

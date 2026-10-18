@@ -5,10 +5,11 @@ const app = express();
 app.disable("x-powered-by");
 app.use(
   helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://apis.google.com"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'"],
         imgSrc: [
@@ -20,6 +21,16 @@ app.use(
         connectSrc: [
           "'self'",
           process.env.PUBLIC_API_URL || "http://localhost:4000",
+          "https://identitytoolkit.googleapis.com",
+          "https://securetoken.googleapis.com",
+          "https://www.googleapis.com",
+          "https://apis.google.com",
+          "https://*.firebaseapp.com",
+        ],
+        frameSrc: [
+          "'self'",
+          "https://*.firebaseapp.com",
+          "https://accounts.google.com",
         ],
         frameAncestors: ["'none'"],
       },

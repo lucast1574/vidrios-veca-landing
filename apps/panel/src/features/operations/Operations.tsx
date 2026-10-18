@@ -9,7 +9,13 @@ function current() {
     proposal: parts[2] || undefined,
   };
 }
-export function Operations({ view }: { view: "leads" | "inventory" }) {
+export function Operations({
+  view,
+  inventoryAccess = true,
+}: {
+  view: "leads" | "inventory";
+  inventoryAccess?: boolean;
+}) {
   const [route, setRoute] = useState(current);
   useEffect(() => {
     const update = () => setRoute(current());
@@ -21,6 +27,7 @@ export function Operations({ view }: { view: "leads" | "inventory" }) {
     <LeadDetail
       key={route.id}
       id={route.id}
+      inventoryAccess={inventoryAccess}
       proposal={route.proposal}
       back={() => {
         location.hash = "leads";

@@ -15,12 +15,15 @@ import {
 import { Database } from "../database/database.module";
 import type { ProjectDocument } from "./project.document";
 import { ProjectsRepository } from "./projects.repository";
+import { MailService } from "../mail/mail.service";
+import { config } from "../common/config";
 import { parse } from "../common/validation";
 @Injectable()
 export class ProjectsService {
   constructor(
     private readonly repo: ProjectsRepository,
     private readonly database: Database,
+    private readonly mail: MailService,
   ) {}
   admin(d: ProjectDocument) {
     return {
@@ -140,13 +143,32 @@ export class ProjectsService {
       updatedAt: now,
       publishedAt: d.published?.publishedAt || now,
     };
-    return this.admin(
+    const saved = this.admin(
       await this.repo.update(id, version, {
         published,
         publishedVersion: version + 1,
         updatedAt: now,
       }),
     );
+    await this.mail
+      .queue(
+        config.MAIL_NOTIFY_TO,
+        "Proyecto publicado · Vidrios VECA",
+        {
+          title: "Un nuevo proyecto ya está en la web",
+          preview: "Publicación de Vidrios VECA",
+          paragraphs: [
+            `El proyecto «${value.title}» ya está publicado en la web de VECA.`,
+          ],
+          action: {
+            label: "Ver proyecto",
+            url: `${config.SITE_ORIGIN}/proyectos/${d.slug}/`,
+          },
+        },
+        `project-published:${id}:${version + 1}`,
+      )
+      .catch(() => {});
+    return saved;
   }
   async unpublish(id: string, version: number) {
     return this.admin(

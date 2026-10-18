@@ -31,13 +31,36 @@ El control optimista de versión impide que dos pestañas se sobrescriban silenc
 
 ## Acceso
 
-Usuario inicial: `admin`. No existe contraseña universal ni registro público. Provisionar con `POST /auth/bootstrap` usando `ADMIN_BOOTSTRAP_KEY` de entropía alta desde un entorno de confianza. Devuelve un enlace de activación de un solo uso con vigencia de 24 horas. El cliente establece su propia contraseña (mínimo 12 caracteres); el token se consume. Si ya existe administrador no permite reemplazarlo. Alternativa operativa: `node scripts/bootstrap-admin.mjs` en el entorno privado de la API (enlace de 24 horas). Ningún token/contraseña debe guardarse en el repositorio, archivos de entrega ni registros de despliegue.
+El registro admite cualquier correo. Email y contraseña se validan con un código de seis dígitos, válido durante diez minutos y hasta cinco intentos; cada reenvío exige un minuto. Los códigos se guardan como hashes Argon2 y son de un solo uso. Recuperar la contraseña invalida las sesiones anteriores. El acceso con Google verifica el ID token de Firebase en la API (proveedor, proyecto y correo verificado).
 
-Contraseñas Argon2, sesión opaca en cookie HttpOnly/Secure/SameSite, token CSRF y comprobación de Origin en escrituras autenticadas. No hay tokens de sesión en localStorage. Sesiones con expiración en MongoDB y cierre de sesión revocable.
+Los correos del dominio exacto `veca.com.pe`, una vez verificados, reciben Gerencia automáticamente. Los externos quedan pendientes hasta que un administrador los aprueba y asigna un rol desde Usuarios. Suspender o rechazar una cuenta no se revierte al entrar de nuevo con Google. Los permisos se comprueban en la API y se reflejan en el sidebar; cambiar de rol afecta también a sesiones abiertas.
+
+| Rol | Módulos actuales |
+|---|---|
+| Administrador | Dashboard, proyectos, leads, inventario y usuarios |
+| Gerencia | Dashboard, proyectos, leads e inventario |
+| Comercial | Dashboard, proyectos y leads |
+| Operaciones | Dashboard, leads e inventario |
+| Almacén | Dashboard e inventario |
+| Contabilidad / Consulta | Dashboard; preparados para futuros módulos específicos |
+
+El dashboard muestra datos reales según los permisos, sin exponer contactos, obras ni materiales a roles que no pueden consultarlos. El modal reutilizable de acceso describe los roles y los módulos concedidos. Los cambios quedan auditados y usan control de revisión para evitar sobrescrituras; un administrador no puede modificar su propio acceso.
+
+La cuenta heredada `admin` sigue funcionando. El bootstrap de un solo uso con `ADMIN_BOOTSTRAP_KEY` se conserva para instalaciones nuevas. Para invitar un administrador corporativo puede ejecutarse `scripts/provision-user.mjs` en el entorno privado de la API con `PROVISION_EMAIL`, `PROVISION_NAME` y `PROVISION_ROLE`: genera una contraseña que imprime una sola vez, no sobrescribe cuentas existentes y exige verificar la titularidad con código o Google antes de activar el acceso. Ninguna contraseña/token se guarda en el repositorio o archivos de entrega.
+
+Contraseñas Argon2, sesión opaca en cookie HttpOnly/Secure/SameSite, token CSRF y comprobación de Origin en escrituras. No hay tokens de sesión en localStorage. Sesiones con expiración en MongoDB y cierre revocable.
+
+### Firebase y correo transaccional
+
+Crear una aplicación web Firebase y habilitar únicamente el proveedor Google. Autorizar el host exacto del panel. Configurar en la API `FIREBASE_PROJECT_ID`, `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN` y `FIREBASE_APP_ID`. Son valores públicos del SDK; no se necesita distribuir una cuenta de servicio. La contraseña y los códigos de la aplicación se gestionan en MongoDB, no en Firebase Email/Password.
+
+Resend: verificar el dominio mediante sus registros DNS sin alterar los MX/SPF/DKIM de Google Workspace. Crear una clave con **Sending access** limitada al dominio VECA y guardarla solo en `RESEND_API_KEY` del backend. `MAIL_FROM` define el remitente corporativo y `MAIL_NOTIFY_TO` el destinatario interno. El plan gratuito consultado ofrece 3.000 mensajes/mes y 100/día; el proveedor puede modificar esos límites. SMTP es una alternativa mediante `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`.
+
+Los componentes React Email comparten logo, colores y estructura. Se envían códigos de acceso/recuperación, solicitudes y cambios de acceso, confirmaciones de consulta web, cambios de etapa comunicables y avisos internos de publicación. Las notificaciones usan una cola MongoDB con reintentos y claves de idempotencia; los códigos se entregan directamente y nunca se guardan en texto plano en esa cola. `EMAIL_TEST_ENDPOINT` solo se utiliza con `NODE_ENV=test` para capturar mensajes localmente. No configurar ese destino en producción.
 
 ## Imágenes y datos
 
-Solo la API tiene credenciales S3. Se aceptan JPG/PNG/WebP/AVIF de hasta 12 MB y 40 MP, se decodifican, se elimina metadata y se normalizan a WebP de hasta 2400px. Se rechazan SVG y documentos activos. Los originales locales no se conservan. Las fotos de borradores requieren sesión; las fotos vinculadas a una publicación son legibles públicamente. No hay credenciales, ACL públicas ni enlaces directos a objetos privados en el frontend.
+Solo la API tiene credenciales S3. Se aceptan JPG/PNG/WebP/AVIF de hasta 12 MB y 40 MP, se decodifican, se elimina metadata y se normalizan a WebP de hasta 2400px. Se rechazan SVG y documentos activos. Los originales locales no se conservan. Las fotos de borradores requieren una cuenta activa con permiso de proyectos; las fotos vinculadas a una publicación son legibles públicamente. No hay credenciales, ACL públicas ni enlaces directos a objetos privados en el frontend.
 
 No se crean proyectos, testimonios, clientes, certificaciones ni antigüedades ficticias. La galería comercial mantiene sus fotos de arquitectura y créditos en `ASSETS.md`; no se presenta como un portafolio de trabajos ejecutados. Las pruebas usan una base local aislada y no se siembran en producción.
 
@@ -89,8 +112,9 @@ The opening, image changes and glass treatment use CSS transforms/opacity and ho
 `prefers-reduced-motion`. Native scrolling is preserved. No animation library is added.
 Featured publications still come from the existing public API and shared project grid;
 when there are no published features, that section stays hidden. Inspiration images
-are not presented as completed VECA projects. The contact form prepares a WhatsApp
-message; it never reports that a lead was sent or saved to the database.
+are not presented as completed VECA projects. The contact form saves a real consultation through the public API, captures name,
+email and phone, and assigns predefined opportunity tags on the server. WhatsApp
+remains an additional direct contact channel.
 
 The landing and editorial panel share the custom `packages/ui/src/Select.tsx`
 combobox and `select.css`. Theme it through `--select-*` variables; it supports
@@ -98,3 +122,5 @@ arrow keys, Home/End, typeahead, Escape, Tab and outside-click dismissal. Contac
 validation checks the selected space before preparing the WhatsApp link. Focus
 feedback uses color/background/contrast changes; focus outlines and rings are
 intentionally excluded from the public site and panel.
+
+`node tests/access-flow.mjs`: verifica códigos y correo de prueba, aprobación externa, dominio corporativo exacto, límites de roles en sesiones abiertas, privacidad de fotos, recuperación, suspensión y control de concurrencia de códigos. Ejecutar después del arranque limpio de QA; los límites de intentos están activos también durante estas pruebas.

@@ -23,6 +23,7 @@ import {
   type Media,
 } from "@veca/content";
 import { ProjectArticle } from "@veca/ui";
+import { Select } from "@veca/ui/src/Select";
 import { api, post } from "../../lib/api";
 import { Button, Field, Notice, Status } from "../../components/ui";
 import { RichEditor } from "./RichEditor";
@@ -355,17 +356,16 @@ export function ProjectEditor({
             <section className="editor-card">
               <h3>Organización</h3>
               <Field label="Categoría" htmlFor="category">
-                <select
+                <Select
                   id="category"
+                  label="Categoría"
                   value={draft.category}
-                  onChange={(e) => patch("category", e.target.value)}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  options={CATEGORIES.map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  }))}
+                  onChange={(value) => patch("category", value)}
+                />
               </Field>
               <Field label="Ubicación del proyecto" htmlFor="location">
                 <input
@@ -407,20 +407,31 @@ export function ProjectEditor({
             <section className="editor-card">
               <h3>Presentación</h3>
               <Field label="Posición de la portada" htmlFor="cover-layout">
-                <select
+                <Select
                   id="cover-layout"
+                  label="Posición de la portada"
                   value={draft.coverLayout}
-                  onChange={(e) =>
-                    patch(
-                      "coverLayout",
-                      e.target.value as ProjectInput["coverLayout"],
-                    )
+                  options={[
+                    {
+                      value: "top",
+                      label: "Imagen debajo del título",
+                      description: "Portada a todo el ancho",
+                    },
+                    {
+                      value: "left",
+                      label: "Imagen a la izquierda",
+                      description: "Texto junto a la portada",
+                    },
+                    {
+                      value: "right",
+                      label: "Imagen a la derecha",
+                      description: "Texto junto a la portada",
+                    },
+                  ]}
+                  onChange={(value) =>
+                    patch("coverLayout", value as ProjectInput["coverLayout"])
                   }
-                >
-                  <option value="top">Imagen debajo del título</option>
-                  <option value="left">Imagen a la izquierda</option>
-                  <option value="right">Imagen a la derecha</option>
-                </select>
+                />
               </Field>
               <label className="checkbox-field">
                 <input

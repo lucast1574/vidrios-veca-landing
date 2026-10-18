@@ -1,12 +1,21 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { spaces, WHATSAPP } from "./content";
 import { Arrow } from "./Controls";
+import { Select } from "@veca/ui/src/Select";
 export function ProjectContact() {
+  const [space, setSpace] = useState("");
+  const [spaceError, setSpaceError] = useState("");
+  const spaceTrigger = useRef<HTMLButtonElement>(null);
   const [ready, setReady] = useState(false);
   const [link, setLink] = useState(WHATSAPP);
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!space) {
+      setSpaceError("Selecciona el espacio de tu proyecto.");
+      spaceTrigger.current?.focus();
+      return;
+    }
     const data = new FormData(event.currentTarget);
     const message = `Hola, Vidrios VECA. Soy ${String(data.get("name")).trim()}.\nQuiero consultar por: ${data.get("space")}.\nDistrito: ${String(data.get("district")).trim()}.\n\n${String(data.get("idea")).trim()}`;
     setLink(`${WHATSAPP}?text=${encodeURIComponent(message)}`);
@@ -70,17 +79,27 @@ export function ProjectContact() {
             />
           </label>
         </div>
-        <label>
-          Tu espacio
-          <select name="space" defaultValue="" required>
-            <option value="" disabled>
-              Selecciona una opción
-            </option>
-            {spaces.map((s) => (
-              <option key={s.name}>{s.name}</option>
-            ))}
-          </select>
-        </label>
+        <div className="ve-space-field">
+          <label htmlFor="project-space">Tu espacio</label>
+          <Select
+            id="project-space"
+            name="space"
+            label="Tu espacio"
+            value={space}
+            triggerRef={spaceTrigger}
+            error={spaceError}
+            options={spaces.map((s) => ({
+              value: s.name,
+              label: s.name,
+              description: s.details.join(" · "),
+            }))}
+            onChange={(value) => {
+              setSpace(value);
+              setSpaceError("");
+              setReady(false);
+            }}
+          />
+        </div>
         <label>
           La idea
           <textarea

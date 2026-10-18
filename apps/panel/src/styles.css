@@ -40,8 +40,9 @@ a {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid #c24324;
-  outline-offset: 4px;
+  outline: none;
+  box-shadow: none;
+  filter: brightness(0.88);
 }
 input,
 textarea,
@@ -58,7 +59,8 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid #e7492755;
+  outline: none;
+  box-shadow: none;
   border-color: #c54327;
 }
 input[type="range"] {
@@ -1430,4 +1432,8 @@ img {
   .preview-toolbar {
     flex-wrap: wrap;
   }
+}
+
+:focus-visible {
+  outline: none;
 }

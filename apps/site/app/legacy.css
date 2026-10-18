@@ -64,8 +64,10 @@ h3 {
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible {
-  outline: 2px solid var(--orange);
-  outline-offset: 6px;
+  outline: none;
+  box-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 5px;
 }
 ::selection {
   background: var(--orange);
@@ -3120,4 +3122,8 @@ html:not(.js) .hero-image-wrap {
     gap: 28px;
     padding-right: 28px;
   }
+}
+
+:focus-visible {
+  outline: none;
 }

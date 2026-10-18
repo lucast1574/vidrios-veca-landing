@@ -91,3 +91,10 @@ Featured publications still come from the existing public API and shared project
 when there are no published features, that section stays hidden. Inspiration images
 are not presented as completed VECA projects. The contact form prepares a WhatsApp
 message; it never reports that a lead was sent or saved to the database.
+
+The landing and editorial panel share the custom `packages/ui/src/Select.tsx`
+combobox and `select.css`. Theme it through `--select-*` variables; it supports
+arrow keys, Home/End, typeahead, Escape, Tab and outside-click dismissal. Contact
+validation checks the selected space before preparing the WhatsApp link. Focus
+feedback uses color/background/contrast changes; focus outlines and rings are
+intentionally excluded from the public site and panel.

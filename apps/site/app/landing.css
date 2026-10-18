@@ -37,8 +37,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 .ve-home :is(a, button, input, textarea, select, summary):focus-visible {
-  outline: 3px solid var(--ve-orange);
-  outline-offset: 5px;
+  outline: none;
+  box-shadow: none;
 }
 .ve-section {
   padding: 110px max(5vw, 24px);
@@ -1237,4 +1237,43 @@
     width: 14px;
     height: 14px;
   }
+}
+/* Brand-integrated keyboard feedback: no focus outlines or rings. */
+.ve-home :is(a, button):focus-visible {
+  outline: none;
+  box-shadow: none;
+  filter: brightness(0.87);
+}
+.ve-home :is(input, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: #ffffff08;
+}
+.ve-space-field {
+  margin-bottom: 23px;
+}
+.ve-space-field > label {
+  margin-bottom: 0;
+}
+.ve-contact-form .veca-select {
+  --select-text: #f4f5fa;
+  --select-muted: #b1b8cb;
+  --select-surface: #30344e;
+  --select-soft: #272c43;
+  --select-edge: #ffffff26;
+  --select-accent: #ff987a;
+}
+.ve-contact-form .veca-select-trigger {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ffffff45;
+  border-radius: 0;
+  padding: 14px 0;
+  font-size: 13px;
+  min-height: 50px;
+}
+.ve-contact-form .veca-select-trigger:focus-visible,
+.ve-contact-form .veca-select.is-open .veca-select-trigger {
+  filter: none;
+  background: #ffffff06;
 }

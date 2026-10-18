@@ -1,0 +1,138 @@
+.veca-select {
+  --select-text: #272b43;
+  --select-muted: #6b7081;
+  --select-surface: #fff;
+  --select-soft: #f2f3f7;
+  --select-edge: #d9dde5;
+  --select-accent: #d34829;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: var(--select-text);
+  font: inherit;
+}
+.veca-select .veca-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  width: 100%;
+  min-height: 49px;
+  padding: 13px 15px;
+  color: var(--select-text);
+  background: var(--select-surface);
+  border: 1px solid var(--select-edge);
+  border-radius: 9px;
+  text-align: left;
+  line-height: 1.5;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.veca-select .veca-select-trigger:focus-visible,
+.veca-select.is-open .veca-select-trigger {
+  outline: none;
+  box-shadow: none;
+  background: var(--select-soft);
+}
+.veca-select-trigger > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.veca-select.is-open .veca-select-trigger > svg {
+  transform: rotate(180deg);
+}
+.veca-select-placeholder {
+  color: var(--select-muted);
+}
+.veca-select-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 110;
+  max-height: 300px;
+  overflow: auto;
+  padding: 7px;
+  background: linear-gradient(
+    140deg,
+    var(--select-surface),
+    var(--select-soft)
+  );
+  border: 1px solid var(--select-edge);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px #10172b30;
+  animation: veca-select-enter 0.18s ease-out;
+  scrollbar-width: thin;
+  scroll-padding: 7px;
+}
+.veca-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 12px;
+  min-height: 48px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s;
+  color: var(--select-text);
+}
+.veca-select-option strong {
+  display: block;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.veca-select-option small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--select-muted);
+  margin-top: 4px;
+}
+.veca-select-option.is-active {
+  background: color-mix(in srgb, var(--select-accent) 12%, transparent);
+}
+.veca-select-option[aria-selected="true"] strong {
+  color: var(--select-accent);
+}
+.veca-select-option > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--select-accent);
+  flex-shrink: 0;
+}
+.veca-select-option-mark {
+  width: 5px;
+  height: 5px;
+  background: var(--select-edge);
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.veca-select-error {
+  color: var(--select-accent);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+@keyframes veca-select-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .veca-select * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

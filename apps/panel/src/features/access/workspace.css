@@ -29,11 +29,14 @@
   width: 100%;
   font: inherit;
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
 }
 .auth-google:hover,
 .auth-google:focus-visible {
   background: #f0f2f5;
+  border-color: #aeb5c0;
   outline: none;
   box-shadow: none;
 }

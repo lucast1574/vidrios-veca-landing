@@ -275,7 +275,6 @@ html[data-theme="dark"]
     .insert-options,
     .login-panel,
     .login-card,
-    .auth-google,
     .preview-toolbar,
     .editor-intro,
     .image-meta,
@@ -321,9 +320,7 @@ html[data-theme="dark"]
     .role-picker > button:focus-visible,
     .project-tabs button[aria-pressed="true"],
     .editor-toolbar button:hover,
-    .editor-toolbar button.is-active,
-    .auth-google:hover,
-    .auth-google:focus-visible
+    .editor-toolbar button.is-active
   ) {
   background: var(--panel-raised);
   color: var(--panel-ink);

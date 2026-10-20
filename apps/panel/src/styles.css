@@ -315,8 +315,10 @@ img {
   background: #f9f7f2;
 }
 .empty-art > svg {
-  grid-area: 1 / 1;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 .projects-empty h2 {

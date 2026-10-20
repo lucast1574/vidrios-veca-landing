@@ -282,10 +282,8 @@ export default function App() {
           )}
           {!projects.length ? (
             <section className="projects-empty">
-              <div className="empty-art">
+              <div className="empty-art" aria-hidden="true">
                 <Images size={42} />
-                <div />
-                <div />
               </div>
               <p className="overline">
                 UNA NUEVA FORMA DE MOSTRAR LO QUE HACEMOS

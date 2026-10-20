@@ -618,6 +618,8 @@ html:has(.ve-home) {
 }
 .ve-footer > nav {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 30px;
   font-size: 12px;
   margin: 35px 0 40px;
@@ -1440,6 +1442,43 @@ html:has(.ve-home) {
   margin: 16px 12px 0;
   font-size: 10px;
   color: #b5bdc6;
+}
+.ve-team-access,
+.ve-team-access-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.ve-team-access {
+  color: #c1c8d0;
+  font-size: 12px;
+  min-height: 44px;
+}
+.ve-team-access:hover,
+.ve-team-access:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ve-footer > nav > .ve-team-access {
+  margin-left: auto;
+}
+.ve-navigation-panel > .ve-team-access {
+  margin-top: 12px;
+  border-top: 1px solid #ffffff25;
+  border-radius: 0 0 12px 12px;
+  padding-top: 20px;
+}
+.ve-navigation-panel > .ve-team-access svg {
+  color: currentColor;
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 760px) {
+  .ve-footer > nav > .ve-team-access {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
 }
 @keyframes ve-navigation-open {
   from {

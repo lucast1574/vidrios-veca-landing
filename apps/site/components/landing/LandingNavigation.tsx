@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Arrow } from "./Controls";
+import { TeamAccess } from "./TeamAccess";
 const destinations = [
   {
     name: "Soluciones",
@@ -81,6 +82,7 @@ export function LandingNavigation({ home = false }: { home?: boolean }) {
               <Arrow />
             </a>
           ))}
+          <TeamAccess onNavigate={() => setOpen(false)} />
           <span className="ve-navigation-signature">
             Vidrios VECA · Lima, Perú
           </span>

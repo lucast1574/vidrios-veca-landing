@@ -2,6 +2,7 @@
 import { Icon } from "@veca/ui/src/Icon";
 
 import { LandingNavigation } from "./landing/LandingNavigation";
+import { TeamAccess } from "./landing/TeamAccess";
 export function SiteHeader() {
   return <LandingNavigation />;
 }
@@ -46,6 +47,7 @@ export function SiteFooter() {
         <a href="/proyectos/">Proyectos</a>
         <a href="/#contacto">Contacto</a>
         <a href="/privacidad/">Privacidad</a>
+        <TeamAccess />
       </nav>
       <div className="ve-footer-bottom">
         <span>© {new Date().getFullYear()} Vidrios VECA</span>

@@ -329,8 +329,8 @@
 }
 .ops-material-table th {
   padding: 17px 22px;
-  color: #788775;
-  background: #eff3ec;
+  color: var(--panel-secondary);
+  background: var(--panel-raised);
   font-weight: 500;
   font-size: 10px;
 }
@@ -364,14 +364,15 @@
 .ops-empty {
   text-align: center;
   padding: 55px 30px;
-  color: #8e9b89;
+  color: var(--panel-secondary);
 }
 .ops-empty > svg {
   margin: 0 auto 20px;
+  color: var(--panel-accent);
 }
 .ops-empty h2 {
   font-size: 22px;
-  color: #64775f;
+  color: var(--panel-ink);
   margin-bottom: 15px;
   letter-spacing: -0.03em;
 }
@@ -383,7 +384,7 @@
   padding: 25px 0;
   font-size: 12px;
   line-height: 1.8;
-  color: #85917e;
+  color: var(--panel-secondary);
 }
 .ops-ledger > div {
   display: grid;
